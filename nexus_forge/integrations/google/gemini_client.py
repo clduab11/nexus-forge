@@ -83,6 +83,9 @@ class GeminiClient:
             self.pro_model = genai.GenerativeModel('gemini-2.0-flash-exp')
             self.flash_model = genai.GenerativeModel('gemini-2.0-flash-exp')
             
+            # Initialize Flash-Thinking model for deep reasoning
+            self.thinking_model = genai.GenerativeModel('gemini-2.5-flash-thinking')
+            
             # Configure generation settings
             self.generation_config = {
                 "max_output_tokens": 8192,
@@ -229,7 +232,13 @@ class GeminiClient:
                 max_size=1000000
             )
         
-        model = self.pro_model if model_type == "pro" else self.flash_model
+        # Select appropriate model based on type
+        if model_type == "pro":
+            model = self.pro_model
+        elif model_type == "thinking":
+            model = self.thinking_model
+        else:
+            model = self.flash_model
         config = generation_config or self.generation_config
         
         # Apply rate limiting
@@ -411,7 +420,13 @@ class GeminiClient:
         """Create a chat session for multi-turn conversations with error handling"""
         
         try:
-            model = self.pro_model if model_type == "pro" else self.flash_model
+            # Select appropriate model based on type
+            if model_type == "pro":
+                model = self.pro_model
+            elif model_type == "thinking":
+                model = self.thinking_model
+            else:
+                model = self.flash_model
             
             if system_instruction:
                 if len(system_instruction) > 50000:  # Reasonable limit for system instruction

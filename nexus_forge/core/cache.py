@@ -67,6 +67,14 @@ class RedisCache:
         self.max_cache_size = 100 * 1024 * 1024  # 100MB max cache size
         self.metrics = CacheMetrics()
         
+        # Multi-level cache system
+        self.l1_cache = {}  # In-memory for AI responses (fastest access)
+        self.l1_max_size = 1000  # Max items in L1
+        self.l1_ttl = 300  # 5 minutes for L1
+        
+        # L2 is Redis for session state (medium access)
+        # L3 is Redis with longer TTL for rate limiting (slowest access)
+        
         # Cache warming configurations
         self.warm_cache_keys = [
             "popular_gemini_prompts",
@@ -98,6 +106,42 @@ class RedisCache:
             logger.error(f"Redis GET error for key {key}: {str(e)}")
             self.metrics.record_miss()
             return None
+    
+    def get_l1(self, key: str) -> Optional[Any]:
+        """Get value from L1 cache (in-memory, fastest)"""
+        cache_item = self.l1_cache.get(key)
+        if cache_item:
+            # Check TTL
+            if time.time() - cache_item["timestamp"] < self.l1_ttl:
+                self.metrics.record_hit()
+                return cache_item["value"]
+            else:
+                # Expired, remove from L1
+                del self.l1_cache[key]
+        
+        self.metrics.record_miss()
+        return None
+    
+    def get_l2(self, key: str, strategy: CacheStrategy = CacheStrategy.SIMPLE) -> Optional[Any]:
+        """Get value from L2 cache (Redis session state)"""
+        l2_key = f"l2:{key}"
+        return self.get(l2_key, strategy)
+    
+    def get_l3(self, key: str) -> Optional[Any]:
+        """Get value from L3 cache (Redis rate limiting, longest TTL)"""
+        l3_key = f"l3:{key}"
+        try:
+            value = self.client.get(l3_key)
+            if value:
+                self.metrics.record_hit()
+                return json.loads(value.decode('utf-8'))
+            else:
+                self.metrics.record_miss()
+                return None
+        except Exception as e:
+            logger.error(f"L3 cache GET error for key {key}: {str(e)}")
+            self.metrics.record_miss()
+            return None
 
     def set(self, key: str, value: Any, timeout: int = None, strategy: CacheStrategy = CacheStrategy.SIMPLE) -> bool:
         """Set value in cache with intelligent serialization"""
@@ -117,6 +161,54 @@ class RedisCache:
         except Exception as e:
             logger.error(f"Redis SET error for key {key}: {str(e)}")
             return False
+    
+    def set_l1(self, key: str, value: Any) -> bool:
+        """Set value in L1 cache (in-memory, fastest)"""
+        try:
+            # Evict if L1 is full
+            if len(self.l1_cache) >= self.l1_max_size:
+                self._evict_l1_lru()
+            
+            self.l1_cache[key] = {
+                "value": value,
+                "timestamp": time.time()
+            }
+            self.metrics.record_set()
+            return True
+        except Exception as e:
+            logger.error(f"L1 cache SET error for key {key}: {str(e)}")
+            return False
+    
+    def set_l2(self, key: str, value: Any, timeout: int = 1800, strategy: CacheStrategy = CacheStrategy.SIMPLE) -> bool:
+        """Set value in L2 cache (Redis session state)"""
+        l2_key = f"l2:{key}"
+        return self.set(l2_key, value, timeout, strategy)
+    
+    def set_l3(self, key: str, value: Any, timeout: int = 86400) -> bool:
+        """Set value in L3 cache (Redis rate limiting, longest TTL)"""
+        l3_key = f"l3:{key}"
+        try:
+            serialized_value = json.dumps(value).encode('utf-8')
+            result = self.client.set(l3_key, serialized_value, ex=timeout)
+            if result:
+                self.metrics.record_set()
+            return result
+        except Exception as e:
+            logger.error(f"L3 cache SET error for key {key}: {str(e)}")
+            return False
+    
+    def _evict_l1_lru(self):
+        """Evict least recently used item from L1 cache"""
+        if not self.l1_cache:
+            return
+        
+        # Find oldest item
+        oldest_key = min(
+            self.l1_cache.keys(),
+            key=lambda k: self.l1_cache[k]["timestamp"]
+        )
+        del self.l1_cache[oldest_key]
+        self.metrics.evictions += 1
 
     def delete(self, key: str) -> bool:
         """Delete value from cache"""

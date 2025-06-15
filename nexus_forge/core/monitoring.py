@@ -14,16 +14,25 @@ from threading import Lock
 from contextvars import ContextVar
 import psutil
 import redis
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.redis import RedisInstrumentor
+# Optional OpenTelemetry imports with fallback
+try:
+    from opentelemetry import trace
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+    from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+    from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+    from opentelemetry.instrumentation.redis import RedisInstrumentor
+    OPENTELEMETRY_AVAILABLE = True
+except ImportError:
+    OPENTELEMETRY_AVAILABLE = False
+    trace = None
 import threading
 from dataclasses import dataclass, asdict
 
-# Configure logging
+# Configure logging - ensure logs directory exists
+import os
+os.makedirs('logs', exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -116,6 +125,10 @@ class DistributedTracing:
     
     def _setup_tracing(self):
         """Setup OpenTelemetry tracing"""
+        if not OPENTELEMETRY_AVAILABLE:
+            logger.warning("OpenTelemetry not available, tracing disabled")
+            return
+            
         try:
             # Configure tracer provider
             trace.set_tracer_provider(TracerProvider())
@@ -138,9 +151,9 @@ class DistributedTracing:
         except Exception as e:
             logger.error(f"Failed to initialize distributed tracing: {e}")
     
-    def start_span(self, operation_name: str, **attributes) -> 'Span':
+    def start_span(self, operation_name: str, **attributes):
         """Start a new trace span"""
-        if not self.tracer:
+        if not self.tracer or not OPENTELEMETRY_AVAILABLE:
             return None
         
         span = self.tracer.start_span(operation_name)
@@ -775,6 +788,10 @@ api_logger = APILogger()
 
 # Initialize structured logger
 structured_logger = StructuredLogger("nexus-forge-api")
+
+def get_logger(name: str = "nexus-forge") -> StructuredLogger:
+    """Get a structured logger instance for the given service name."""
+    return StructuredLogger(name)
 
 def create_correlation_context(correlation_id_val: str, user_id_val: str, request_id_val: str):
     """Create context manager for request correlation"""

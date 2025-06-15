@@ -20,7 +20,7 @@ class ResearchQueryValidator(BaseModel):
     query: str = Field(..., min_length=3, max_length=1000, description="The research query")
     mode: Optional[str] = Field(
         "comprehensive", 
-        regex="^(quick|comprehensive|continuous)$",
+        pattern="^(quick|comprehensive|continuous)$",
         description="Research mode"
     )
     focus_areas: Optional[List[str]] = Field(
@@ -30,7 +30,7 @@ class ResearchQueryValidator(BaseModel):
     )
     language: Optional[str] = Field(
         "en", 
-        regex="^[a-z]{2}$",
+        pattern="^[a-z]{2}$",
         description="Two-letter language code"
     )
     
@@ -102,8 +102,8 @@ class ResearchQueryValidator(BaseModel):
 class WebSocketMessageValidator(BaseModel):
     """Validates WebSocket messages"""
     
-    type: str = Field(..., regex="^[a-z_]+$", max_length=50)
-    session_id: Optional[str] = Field(None, regex="^[a-f0-9-]{36}$")
+    type: str = Field(..., pattern="^[a-z_]+$", max_length=50)
+    session_id: Optional[str] = Field(None, pattern="^[a-f0-9-]{36}$")
     data: Optional[Dict[str, Any]] = Field(default_factory=dict)
     
     @validator('type')

@@ -218,3 +218,67 @@ class PayloadTooLargeError(NexusForgeError):
             status_code=413,
             details=size_details
         )
+
+
+class OrchestrationError(NexusForgeError):
+    """Raised when orchestration process fails."""
+    
+    def __init__(self, message: str, agent: Optional[str] = None, details: Optional[Dict[str, Any]] = None):
+        orchestration_details = {"agent": agent} if agent else {}
+        if details:
+            orchestration_details.update(details)
+            
+        super().__init__(
+            message=message,
+            error_code="ORCHESTRATION_ERROR",
+            status_code=500,
+            details=orchestration_details
+        )
+
+
+class CoordinationError(NexusForgeError):
+    """Raised when agent coordination fails."""
+    
+    def __init__(self, message: str, agents: Optional[list] = None, details: Optional[Dict[str, Any]] = None):
+        coordination_details = {"agents": agents} if agents else {}
+        if details:
+            coordination_details.update(details)
+            
+        super().__init__(
+            message=message,
+            error_code="COORDINATION_ERROR",
+            status_code=500,
+            details=coordination_details
+        )
+
+
+class AgentError(NexusForgeError):
+    """Raised when an AI agent fails to execute."""
+    
+    def __init__(self, message: str, agent_name: Optional[str] = None, details: Optional[Dict[str, Any]] = None):
+        agent_details = {"agent_name": agent_name} if agent_name else {}
+        if details:
+            agent_details.update(details)
+            
+        super().__init__(
+            message=message,
+            error_code="AGENT_ERROR",
+            status_code=500,
+            details=agent_details
+        )
+
+
+class TaskDecompositionError(NexusForgeError):
+    """Raised when task decomposition fails."""
+    
+    def __init__(self, message: str, task: Optional[str] = None, details: Optional[Dict[str, Any]] = None):
+        task_details = {"task": task} if task else {}
+        if details:
+            task_details.update(details)
+            
+        super().__init__(
+            message=message,
+            error_code="TASK_DECOMPOSITION_ERROR",
+            status_code=422,
+            details=task_details
+        )

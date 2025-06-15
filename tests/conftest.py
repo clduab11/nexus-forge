@@ -230,6 +230,279 @@ def sample_websocket_message():
 # ====== NEXUS FORGE SPECIFIC FIXTURES ======
 
 @pytest_asyncio.fixture
+async def mock_enhanced_starri_orchestrator():
+    """Mock enhanced Starri Orchestrator with deep thinking capabilities"""
+    from nexus_forge.agents.starri.orchestrator import StarriOrchestrator, ThinkingMode, AgentCapability
+    
+    with patch('nexus_forge.agents.starri.orchestrator.GeminiClient'), \
+         patch('nexus_forge.agents.starri.orchestrator.SupabaseCoordinationClient'), \
+         patch('nexus_forge.agents.starri.orchestrator.Mem0KnowledgeClient'), \
+         patch('nexus_forge.agents.starri.orchestrator.RedisCache'):
+        
+        orchestrator = StarriOrchestrator(
+            project_id="test-project",
+            supabase_url="https://test.supabase.co",
+            supabase_key="test-key"
+        )
+        
+        # Mock all clients
+        orchestrator.gemini_client = AsyncMock()
+        orchestrator.coordination_client = AsyncMock()
+        orchestrator.knowledge_client = AsyncMock()
+        orchestrator.cache = AsyncMock()
+        
+        # Mock thinking capabilities
+        orchestrator.think_deeply = AsyncMock(return_value={
+            "thinking_chain": [
+                {"step": 1, "thought": "Analyzing the problem...", "confidence": 0.8},
+                {"step": 2, "thought": "Considering solutions...", "confidence": 0.9}
+            ],
+            "conclusion": {"conclusion": "Optimal solution found", "confidence": 0.9},
+            "confidence": 0.9,
+            "thinking_time": 2.5
+        })
+        
+        # Mock task decomposition
+        orchestrator.decompose_task = AsyncMock(return_value={
+            "workflow_id": "test_workflow_123",
+            "decomposition": {
+                "subtasks": [
+                    {"id": "task_1", "description": "UI Design", "required_capabilities": ["ui_design"]},
+                    {"id": "task_2", "description": "Backend API", "required_capabilities": ["code_generation"]}
+                ]
+            },
+            "confidence": 0.85
+        })
+        
+        # Mock agent coordination
+        orchestrator.coordinate_agents = AsyncMock(return_value={
+            "workflow_id": "test_workflow_123",
+            "status": "completed",
+            "results": {"task_1": "success", "task_2": "success"},
+            "metrics": {"tasks_completed": 2, "tasks_failed": 0}
+        })
+        
+        yield orchestrator
+
+
+@pytest_asyncio.fixture
+async def mock_supabase_coordination():
+    """Mock Supabase coordination client"""
+    from nexus_forge.integrations.supabase.coordination_client import SupabaseCoordinationClient
+    
+    with patch('nexus_forge.integrations.supabase.coordination_client.create_client'):
+        client = SupabaseCoordinationClient(
+            url="https://test.supabase.co",
+            key="test-key",
+            project_id="test-project"
+        )
+        
+        # Mock Supabase client
+        client.client = MagicMock()
+        client.client.table.return_value.insert.return_value.execute.return_value.data = [{"id": "test_id"}]
+        client.client.table.return_value.select.return_value.execute.return_value.data = []
+        client.client.table.return_value.update.return_value.eq.return_value.execute.return_value = MagicMock()
+        
+        # Mock connection success
+        client.connected = True
+        
+        yield client
+
+
+@pytest_asyncio.fixture
+async def mock_mem0_knowledge():
+    """Mock Mem0 knowledge client"""
+    from nexus_forge.integrations.mem0.knowledge_client import Mem0KnowledgeClient
+    
+    with patch('nexus_forge.integrations.mem0.knowledge_client.RedisCache'):
+        client = Mem0KnowledgeClient(
+            api_key="test-key",
+            orchestrator_id="test_orch"
+        )
+        
+        client.cache = MagicMock()
+        client.entity_cache = {}
+        client.relationship_cache = {}
+        
+        # Mock methods
+        client.create_entity = AsyncMock(return_value="entity_123")
+        client.create_relationship = AsyncMock(return_value="rel_123")
+        client.search_patterns = AsyncMock(return_value=[])
+        client.add_thinking_pattern = AsyncMock(return_value="pattern_123")
+        
+        yield client
+
+
+@pytest_asyncio.fixture
+async def mock_redis_cache():
+    """Mock Redis cache with multi-level caching"""
+    from nexus_forge.core.cache import RedisCache, CacheStrategy
+    
+    with patch('nexus_forge.core.cache.redis.StrictRedis'):
+        cache = RedisCache()
+        cache.client = MagicMock()
+        cache.client.ping.return_value = True
+        
+        # Mock L1 cache
+        cache.l1_cache = {}
+        
+        # Mock cache operations
+        cache.get = MagicMock(return_value=None)
+        cache.set = MagicMock(return_value=True)
+        cache.get_l1 = MagicMock(return_value=None)
+        cache.set_l1 = MagicMock(return_value=True)
+        cache.get_l2 = MagicMock(return_value=None)
+        cache.set_l2 = MagicMock(return_value=True)
+        cache.get_l3 = MagicMock(return_value=None)
+        cache.set_l3 = MagicMock(return_value=True)
+        
+        # Mock metrics
+        cache.get_cache_stats = MagicMock(return_value={
+            "hit_rate": 85.5,
+            "total_hits": 100,
+            "total_misses": 15
+        })
+        
+        yield cache
+
+
+@pytest.fixture
+def sample_thinking_modes():
+    """Sample data for testing thinking modes"""
+    from nexus_forge.agents.starri.orchestrator import ThinkingMode
+    
+    return {
+        ThinkingMode.DEEP_ANALYSIS: {
+            "prompt": "Analyze this complex optimization problem",
+            "expected_steps": 3,
+            "expected_confidence": 0.8
+        },
+        ThinkingMode.QUICK_DECISION: {
+            "prompt": "Make a quick decision on framework choice",
+            "expected_steps": 2,
+            "expected_confidence": 0.7
+        },
+        ThinkingMode.PLANNING: {
+            "prompt": "Plan the implementation of this feature",
+            "expected_steps": 4,
+            "expected_confidence": 0.85
+        },
+        ThinkingMode.COORDINATION: {
+            "prompt": "Coordinate multiple agents for this task",
+            "expected_steps": 3,
+            "expected_confidence": 0.8
+        },
+        ThinkingMode.REFLECTION: {
+            "prompt": "Reflect on the completed workflow",
+            "expected_steps": 2,
+            "expected_confidence": 0.9
+        }
+    }
+
+
+@pytest.fixture
+def sample_agent_capabilities():
+    """Sample agent capabilities for testing"""
+    from nexus_forge.agents.starri.orchestrator import AgentCapability
+    
+    return {
+        "ui_designer": [AgentCapability.UI_DESIGN, AgentCapability.IMAGE_GENERATION],
+        "backend_developer": [AgentCapability.CODE_GENERATION, AgentCapability.API_INTEGRATION],
+        "fullstack_developer": [
+            AgentCapability.CODE_GENERATION,
+            AgentCapability.UI_DESIGN,
+            AgentCapability.TESTING,
+            AgentCapability.DEPLOYMENT
+        ],
+        "qa_engineer": [AgentCapability.TESTING, AgentCapability.DATA_ANALYSIS],
+        "devops_engineer": [AgentCapability.DEPLOYMENT, AgentCapability.OPTIMIZATION]
+    }
+
+
+@pytest.fixture
+def sample_workflow_decomposition():
+    """Sample workflow decomposition for testing"""
+    return {
+        "workflow_id": "sample_workflow_001",
+        "decomposition": {
+            "subtasks": [
+                {
+                    "id": "design_ui",
+                    "description": "Design user interface components",
+                    "required_capabilities": ["ui_design"],
+                    "estimated_duration": "60m",
+                    "dependencies": [],
+                    "complexity": "medium"
+                },
+                {
+                    "id": "implement_backend",
+                    "description": "Create REST API endpoints",
+                    "required_capabilities": ["code_generation", "api_integration"],
+                    "estimated_duration": "90m",
+                    "dependencies": [],
+                    "complexity": "medium"
+                },
+                {
+                    "id": "integrate_frontend",
+                    "description": "Connect frontend to backend",
+                    "required_capabilities": ["code_generation"],
+                    "estimated_duration": "45m",
+                    "dependencies": ["design_ui", "implement_backend"],
+                    "complexity": "low"
+                },
+                {
+                    "id": "write_tests",
+                    "description": "Create comprehensive test suite",
+                    "required_capabilities": ["testing"],
+                    "estimated_duration": "60m",
+                    "dependencies": ["integrate_frontend"],
+                    "complexity": "medium"
+                },
+                {
+                    "id": "deploy_application",
+                    "description": "Deploy to production environment",
+                    "required_capabilities": ["deployment"],
+                    "estimated_duration": "30m",
+                    "dependencies": ["write_tests"],
+                    "complexity": "low"
+                }
+            ],
+            "total_duration": "285m",
+            "critical_path": ["design_ui", "integrate_frontend", "write_tests", "deploy_application"],
+            "execution_strategy": "mixed"
+        },
+        "confidence": 0.88
+    }
+
+
+@pytest.fixture
+def performance_thresholds():
+    """Performance thresholds for testing"""
+    return {
+        "thinking_time": {
+            "max_per_step": 5.0,  # seconds
+            "max_total": 30.0     # seconds
+        },
+        "task_decomposition": {
+            "max_time": 10.0,     # seconds
+            "min_confidence": 0.7
+        },
+        "agent_coordination": {
+            "max_setup_time": 5.0,    # seconds
+            "max_execution_time": 300.0,  # 5 minutes
+            "min_success_rate": 0.9
+        },
+        "cache_operations": {
+            "l1_max_time": 0.001,  # 1ms
+            "l2_max_time": 0.01,   # 10ms
+            "l3_max_time": 0.1     # 100ms
+        }
+    }
+
+
+# ====== NEXUS FORGE SPECIFIC FIXTURES ======
+
+@pytest_asyncio.fixture
 async def mock_starri_orchestrator():
     """Mock Starri Orchestrator for testing"""
     with patch('nexus_forge.agents.agents.nexus_forge_agents.StarriOrchestrator') as mock_class:

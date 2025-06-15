@@ -7,9 +7,9 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 import secrets
 
-from ..models import User
+from ...models import User
 from ..schemas.auth import TokenData
-from ..config import settings
+from ...config import settings
 from .database import get_db
 
 # Password hashing context
