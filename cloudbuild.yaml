@@ -1,0 +1,112 @@
+# Google Cloud Build configuration for ParallaxMind ADK deployment
+
+steps:
+  # Build backend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-f'
+      - 'Dockerfile.backend'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/parallaxmind-backend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/parallaxmind-backend:latest'
+      - '.'
+    id: 'build-backend'
+
+  # Build frontend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'Dockerfile.frontend'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/parallaxmind-frontend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/parallaxmind-frontend:latest'
+      - '.'
+    id: 'build-frontend'
+
+  # Push backend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/parallaxmind-backend:$COMMIT_SHA'
+    id: 'push-backend'
+    waitFor: ['build-backend']
+
+  # Push frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/parallaxmind-frontend:$COMMIT_SHA'
+    id: 'push-frontend'
+    waitFor: ['build-frontend']
+
+  # Deploy to Cloud Run (Backend)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'parallaxmind-backend'
+      - '--image=gcr.io/$PROJECT_ID/parallaxmind-backend:$COMMIT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=8000'
+      - '--memory=2Gi'
+      - '--cpu=2'
+      - '--concurrency=100'
+      - '--max-instances=10'
+      - '--set-env-vars=ENVIRONMENT=production,ADK_ENABLED=true'
+      - '--set-secrets=SECRET_KEY=parallaxmind-secret:latest,DATABASE_URL=parallaxmind-db-url:latest,VERTEX_PROJECT_ID=vertex-project-id:latest'
+    id: 'deploy-backend'
+    waitFor: ['push-backend']
+
+  # Deploy to Cloud Run (Frontend)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'parallaxmind-frontend'
+      - '--image=gcr.io/$PROJECT_ID/parallaxmind-frontend:$COMMIT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=80'
+      - '--memory=1Gi'
+      - '--cpu=1'
+      - '--concurrency=80'
+      - '--max-instances=5'
+    id: 'deploy-frontend'
+    waitFor: ['push-frontend']
+
+  # Initialize ADK agents
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Install ADK CLI
+        pip install google-cloud-aiplatform[adk]
+        
+        # Deploy ADK configuration
+        adk init parallaxmind --project=$PROJECT_ID --region=us-central1
+        adk config set project_id $PROJECT_ID
+        adk config set region us-central1
+        
+        # Deploy agents
+        adk deploy --config=adk.yaml
+    id: 'deploy-adk'
+    waitFor: ['deploy-backend']
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+timeout: '1200s'
+
+substitutions:
+  _ENVIRONMENT: 'production'

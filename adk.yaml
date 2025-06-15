@@ -1,0 +1,157 @@
+# Google Cloud ADK Configuration for ParallaxMind
+# Agent Development Kit deployment configuration
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: parallaxmind-adk-config
+  namespace: default
+data:
+  # ADK Agent Configuration
+  agent_config.yaml: |
+    agents:
+      orchestrator:
+        name: "ParallaxMind Orchestrator"
+        description: "Main controller for multi-agent research system"
+        version: "1.0.0"
+        model: "gemini-pro"
+        delegation_threshold: 0.75
+        max_delegation_depth: 3
+        tools:
+          - google_search
+          - code_exec
+        
+      retrieval_agent:
+        name: "Information Retrieval Agent"
+        description: "Specialized agent for web search and content extraction"
+        version: "1.0.0"
+        model: "gemini-pro"
+        tools:
+          - google_search
+        
+      analysis_agent:
+        name: "Analysis Agent"
+        description: "Content analysis and synthesis specialist"
+        version: "1.0.0"
+        model: "gemini-pro"
+        
+      citation_agent:
+        name: "Citation Agent"
+        description: "Source tracking and citation management"
+        version: "1.0.0"
+        model: "gemini-pro"
+        
+      knowledge_graph_agent:
+        name: "Knowledge Graph Agent"
+        description: "Knowledge graph creation and visualization"
+        version: "1.0.0"
+        model: "gemini-pro"
+
+    # Tool Configurations
+    tools:
+      google_search:
+        enabled: true
+        api_key: ${GOOGLE_SEARCH_API_KEY}
+        search_engine_id: ${GOOGLE_SEARCH_ENGINE_ID}
+        
+      code_exec:
+        enabled: true
+        runtime: "python3.11"
+        timeout: 60
+
+    # Model Configurations
+    models:
+      gemini-pro:
+        provider: "vertex_ai"
+        project_id: ${VERTEX_PROJECT_ID}
+        location: ${VERTEX_LOCATION}
+        model_name: "gemini-pro"
+        temperature: 0.7
+        max_output_tokens: 2048
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parallaxmind-adk
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: parallaxmind-adk
+  template:
+    metadata:
+      labels:
+        app: parallaxmind-adk
+    spec:
+      containers:
+      - name: parallaxmind-backend
+        image: gcr.io/${PROJECT_ID}/parallaxmind-backend:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: ADK_CONFIG_PATH
+          value: "/config/agent_config.yaml"
+        - name: VERTEX_PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              name: adk-secrets
+              key: project_id
+        - name: VERTEX_LOCATION
+          value: "us-central1"
+        - name: GOOGLE_SEARCH_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: adk-secrets
+              key: google_search_api_key
+        - name: GOOGLE_SEARCH_ENGINE_ID
+          valueFrom:
+            secretKeyRef:
+              name: adk-secrets
+              key: google_search_engine_id
+        volumeMounts:
+        - name: adk-config
+          mountPath: /config
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+      volumes:
+      - name: adk-config
+        configMap:
+          name: parallaxmind-adk-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parallaxmind-adk-service
+  namespace: default
+spec:
+  selector:
+    app: parallaxmind-adk
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: adk-secrets
+  namespace: default
+type: Opaque
+stringData:
+  project_id: "your-google-cloud-project-id"
+  google_search_api_key: "your-google-search-api-key"
+  google_search_engine_id: "your-search-engine-id"
+  database_url: "postgresql://username:password@database-host:5432/parallaxmind"
+  redis_url: "redis://redis-host:6379/0"
+  secret_key: "your-production-secret-key"

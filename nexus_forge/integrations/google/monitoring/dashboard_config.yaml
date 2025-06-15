@@ -1,0 +1,292 @@
+# Parallax Pal Monitoring Dashboard Configuration
+# This file defines the Google Cloud Monitoring dashboard layout
+
+dashboard:
+  displayName: "Parallax Pal Production Dashboard"
+  mosaicLayout:
+    columns: 12
+    tiles:
+      # Row 1: Key Metrics
+      - width: 3
+        height: 2
+        widget:
+          title: "Active Users"
+          scorecard:
+            timeSeriesQuery:
+              timeSeriesFilter:
+                filter: 'metric.type="custom.googleapis.com/parallax_pal/active_websocket_connections"'
+                aggregation:
+                  alignmentPeriod: 60s
+                  perSeriesAligner: ALIGN_MEAN
+            sparkChartView:
+              sparkChartType: SPARK_LINE
+      
+      - xPos: 3
+        width: 3
+        height: 2
+        widget:
+          title: "Research Queries (24h)"
+          scorecard:
+            timeSeriesQuery:
+              timeSeriesFilter:
+                filter: 'metric.type="custom.googleapis.com/parallax_pal/research_queries_total"'
+                aggregation:
+                  alignmentPeriod: 86400s
+                  perSeriesAligner: ALIGN_RATE
+                  crossSeriesReducer: REDUCE_SUM
+            sparkChartView:
+              sparkChartType: SPARK_BAR
+      
+      - xPos: 6
+        width: 3
+        height: 2
+        widget:
+          title: "Avg Query Duration"
+          scorecard:
+            timeSeriesQuery:
+              timeSeriesFilter:
+                filter: 'metric.type="custom.googleapis.com/parallax_pal/research_query_duration_seconds"'
+                aggregation:
+                  alignmentPeriod: 300s
+                  perSeriesAligner: ALIGN_PERCENTILE_95
+                  crossSeriesReducer: REDUCE_MEAN
+            gaugeView:
+              lowerBound: 0
+              upperBound: 60
+      
+      - xPos: 9
+        width: 3
+        height: 2
+        widget:
+          title: "Error Rate"
+          scorecard:
+            timeSeriesQuery:
+              timeSeriesFilter:
+                filter: 'metric.type="custom.googleapis.com/parallax_pal/agent_errors_total"'
+                aggregation:
+                  alignmentPeriod: 300s
+                  perSeriesAligner: ALIGN_RATE
+                  crossSeriesReducer: REDUCE_SUM
+            thresholds:
+              - value: 0.05
+                color: RED
+              - value: 0.01
+                color: YELLOW
+      
+      # Row 2: Agent Performance
+      - yPos: 2
+        width: 6
+        height: 3
+        widget:
+          title: "Agent Response Times"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/agent_response_time_seconds"'
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_PERCENTILE_95
+                      groupByFields:
+                        - metric.label.agent_name
+                plotType: LINE
+            timeshiftDuration: 0s
+            yAxis:
+              label: "Response Time (s)"
+              scale: LINEAR
+      
+      - xPos: 6
+        yPos: 2
+        width: 6
+        height: 3
+        widget:
+          title: "Agent Invocations"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/agent_invocations_total"'
+                    aggregation:
+                      alignmentPeriod: 300s
+                      perSeriesAligner: ALIGN_RATE
+                      groupByFields:
+                        - metric.label.agent_name
+                plotType: STACKED_AREA
+            yAxis:
+              label: "Invocations/min"
+              scale: LINEAR
+      
+      # Row 3: System Resources
+      - yPos: 5
+        width: 4
+        height: 3
+        widget:
+          title: "CPU Usage"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/cpu_usage_percent"'
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN
+                      groupByFields:
+                        - metric.label.service
+                plotType: LINE
+            yAxis:
+              label: "CPU %"
+              scale: LINEAR
+            thresholds:
+              - value: 80
+                color: YELLOW
+              - value: 90
+                color: RED
+      
+      - xPos: 4
+        yPos: 5
+        width: 4
+        height: 3
+        widget:
+          title: "Memory Usage"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/memory_usage_bytes"'
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN
+                      groupByFields:
+                        - metric.label.service
+                plotType: LINE
+            yAxis:
+              label: "Memory (GB)"
+              scale: LINEAR
+      
+      - xPos: 8
+        yPos: 5
+        width: 4
+        height: 3
+        widget:
+          title: "GPU Usage"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/gpu_usage_percent" AND metric.label.metric_type="compute"'
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN
+                      groupByFields:
+                        - metric.label.gpu_id
+                plotType: LINE
+            yAxis:
+              label: "GPU %"
+              scale: LINEAR
+      
+      # Row 4: Feature Usage
+      - yPos: 8
+        width: 4
+        height: 3
+        widget:
+          title: "Export Formats"
+          pieChart:
+            chartType: DONUT
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/export_operations_total"'
+                    aggregation:
+                      alignmentPeriod: 3600s
+                      perSeriesAligner: ALIGN_RATE
+                      crossSeriesReducer: REDUCE_SUM
+                      groupByFields:
+                        - metric.label.format
+      
+      - xPos: 4
+        yPos: 8
+        width: 4
+        height: 3
+        widget:
+          title: "Voice Interactions"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/voice_interactions_total"'
+                    aggregation:
+                      alignmentPeriod: 300s
+                      perSeriesAligner: ALIGN_RATE
+                      groupByFields:
+                        - metric.label.type
+                plotType: STACKED_BAR
+            yAxis:
+              label: "Interactions/min"
+              scale: LINEAR
+      
+      - xPos: 8
+        yPos: 8
+        width: 4
+        height: 3
+        widget:
+          title: "Cache Performance"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/cache_operations_total" AND metric.label.status="hit"'
+                    aggregation:
+                      alignmentPeriod: 300s
+                      perSeriesAligner: ALIGN_RATE
+                plotType: LINE
+                targetAxis: Y1
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/cache_operations_total" AND metric.label.status="miss"'
+                    aggregation:
+                      alignmentPeriod: 300s
+                      perSeriesAligner: ALIGN_RATE
+                plotType: LINE
+                targetAxis: Y1
+            yAxis:
+              label: "Operations/min"
+              scale: LINEAR
+      
+      # Row 5: Token Usage and Costs
+      - yPos: 11
+        width: 6
+        height: 3
+        widget:
+          title: "Token Usage by Agent"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: 'metric.type="custom.googleapis.com/parallax_pal/agent_token_usage_total"'
+                    aggregation:
+                      alignmentPeriod: 3600s
+                      perSeriesAligner: ALIGN_RATE
+                      groupByFields:
+                        - metric.label.agent
+                        - metric.label.token_type
+                plotType: STACKED_BAR
+            yAxis:
+              label: "Tokens/hour"
+              scale: LINEAR
+      
+      - xPos: 6
+        yPos: 11
+        width: 6
+        height: 3
+        widget:
+          title: "Rate Limit Hits"
+          heatmap:
+            timeSeriesQuery:
+              timeSeriesFilter:
+                filter: 'metric.type="custom.googleapis.com/parallax_pal/rate_limit_hits_total"'
+                aggregation:
+                  alignmentPeriod: 300s
+                  perSeriesAligner: ALIGN_RATE
+                  groupByFields:
+                    - metric.label.endpoint
+                    - metric.label.user_tier

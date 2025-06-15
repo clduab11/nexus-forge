@@ -1,0 +1,144 @@
+name: parallaxmind
+display_name: ParallaxMind Multi-Agent Research Assistant
+description: |
+  ParallaxMind is a multi-agent research assistant that leverages Google Cloud's Agent Development Kit 
+  to coordinate specialized agents for enhanced research capabilities, knowledge visualization, 
+  and interactive user experience.
+
+version: "0.1.0"
+agent_description: |
+  ParallaxMind coordinates multiple specialized agents to provide comprehensive research assistance.
+  It features a hierarchical agent structure with an orchestrator that delegates to specialized agents
+  for information retrieval, content analysis, citation management, knowledge graph visualization,
+  and interactive UI experience.
+
+agent_definition:
+  # Define the orchestrator agent
+  agent_type: adk.orchestrator
+  agent_id: orchestrator_agent
+  display_name: "ParallaxMind Orchestrator"
+  class_path: agents.orchestrator.orchestrator_agent.OrchestratorAgent
+  tools:
+    - google_search
+    - vertex_ai_generate
+    - code_exec
+  model:
+    provider: vertex_ai
+    name: gemini-1.5-pro
+    parameters:
+      temperature: 0.2
+      top_p: 0.95
+      top_k: 40
+  
+  # Define sub-agents
+  sub_agents:
+    # Information Retrieval Agent
+    - agent_id: retrieval_agent
+      display_name: "Information Retrieval Agent"
+      class_path: agents.research.retrieval_agent.RetrievalAgent
+      description: "Searches and retrieves information from various sources"
+      tools:
+        - google_search
+        - code_exec
+        - vertex_ai_generate
+      model:
+        provider: vertex_ai
+        name: gemini-1.5-pro
+        parameters:
+          temperature: 0.1
+    
+    # Analysis Agent
+    - agent_id: analysis_agent
+      display_name: "Research Analysis Agent"
+      class_path: agents.research.analysis_agent.AnalysisAgent
+      description: "Analyzes queries and research results to extract insights"
+      tools:
+        - vertex_ai_generate
+        - code_exec
+      model:
+        provider: vertex_ai
+        name: gemini-1.5-pro
+        parameters:
+          temperature: 0.2
+    
+    # Citation Agent
+    - agent_id: citation_agent
+      display_name: "Citation Agent"
+      class_path: agents.citation.citation_agent.CitationAgent
+      description: "Generates and manages citations for research sources"
+      tools:
+        - code_exec
+      model:
+        provider: vertex_ai
+        name: gemini-1.5-pro
+        parameters:
+          temperature: 0.1
+    
+    # Knowledge Graph Agent
+    - agent_id: knowledge_graph_agent
+      display_name: "Knowledge Graph Agent"
+      class_path: agents.knowledge_graph.knowledge_graph_agent.KnowledgeGraphAgent
+      description: "Creates visual knowledge graphs from research"
+      tools:
+        - vertex_ai_generate
+        - code_exec
+      model:
+        provider: vertex_ai
+        name: gemini-1.5-pro
+        parameters:
+          temperature: 0.2
+    
+    # UI Experience Agent
+    - agent_id: ui_agent
+      display_name: "UI Experience Agent"
+      class_path: agents.ui.ui_agent.UIAgent
+      description: "Manages the animated assistant interface and user experience"
+      tools:
+        - vertex_ai_generate
+      model:
+        provider: vertex_ai
+        name: gemini-1.5-pro
+        parameters:
+          temperature: 0.3
+
+# Define custom tools
+tools:
+  - tool_id: knowledge_graph_visualization
+    display_name: "Knowledge Graph Visualization"
+    description: "Visualizes knowledge graphs based on research results"
+    class_path: tools.knowledge_graph_tools.KnowledgeGraphVisualization
+  
+  - tool_id: web_content_extraction
+    display_name: "Web Content Extraction"
+    description: "Extracts and processes content from web pages"
+    class_path: tools.web_tools.WebContentExtraction
+  
+  - tool_id: citation_generator
+    display_name: "Citation Generator"
+    description: "Generates citations in various formats"
+    class_path: tools.citation_tools.CitationGenerator
+
+# Environment variables
+env_vars:
+  ADK_PROJECT_ID: parallaxmind
+  ADK_REGION: us-central1
+  ADK_DEV_MODE: "true"
+  ADK_LOCAL_TESTING: "true"
+
+# Compute resources
+resources:
+  cpu: 4
+  memory: 16Gi
+  accelerator_type: none
+
+# Deployment
+deployment:
+  min_replicas: 1
+  max_replicas: 5
+  autoscaling:
+    cpu_utilization: 60
+    max_concurrent_requests: 100
+
+# GCP configuration
+project: parallaxmind
+location: us-central1

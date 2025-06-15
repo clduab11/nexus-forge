@@ -1,0 +1,382 @@
+# Nexus Forge Production Configuration
+# This file contains production-specific settings for the Nexus Forge application
+
+# =============================================================================
+# Application Configuration
+# =============================================================================
+app:
+  name: "Nexus Forge"
+  version: "1.0.0"
+  environment: "production"
+  debug: false
+  
+  # Server Configuration
+  server:
+    host: "0.0.0.0"
+    port: 8080
+    workers: 4
+    worker_connections: 1000
+    keepalive_timeout: 65
+    max_requests: 1000
+    max_requests_jitter: 50
+    timeout: 300
+    graceful_timeout: 30
+    
+  # Security Configuration
+  security:
+    secret_key: "${SECRET_KEY}"
+    jwt_secret: "${JWT_SECRET}"
+    cors_origins:
+      - "https://nexus-forge.example.com"
+      - "https://api.nexus-forge.example.com"
+      - "https://app.nexus-forge.example.com"
+    cors_methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    cors_headers:
+      - "Content-Type"
+      - "Authorization"
+      - "X-Requested-With"
+      - "X-API-Key"
+    allowed_hosts:
+      - "nexus-forge.example.com"
+      - "api.nexus-forge.example.com"
+    rate_limiting:
+      enabled: true
+      default_rate: "1000/hour"
+      burst_rate: "100/minute"
+      api_rate: "500/hour"
+      upload_rate: "50/hour"
+
+# =============================================================================
+# Database Configuration
+# =============================================================================
+database:
+  # Primary Database (PostgreSQL)
+  primary:
+    url: "${DATABASE_URL}"
+    pool_size: 20
+    max_overflow: 30
+    pool_pre_ping: true
+    pool_recycle: 3600
+    pool_timeout: 30
+    echo: false
+    
+  # Redis Configuration
+  redis:
+    url: "${REDIS_URL}"
+    password: "${REDIS_PASSWORD}"
+    db: 0
+    max_connections: 50
+    retry_on_timeout: true
+    socket_timeout: 5
+    socket_connect_timeout: 5
+    health_check_interval: 30
+    
+  # Connection retry settings
+  retry:
+    max_attempts: 3
+    backoff_factor: 2
+    max_backoff: 30
+
+# =============================================================================
+# Google Cloud Configuration
+# =============================================================================
+gcp:
+  project_id: "${GCP_PROJECT_ID}"
+  region: "${GCP_REGION:-us-central1}"
+  credentials_path: "${GOOGLE_APPLICATION_CREDENTIALS}"
+  
+  # Cloud Storage
+  storage:
+    bucket_name: "${GCP_PROJECT_ID}-nexus-forge-storage"
+    upload_bucket: "${GCP_PROJECT_ID}-nexus-forge-uploads"
+    temp_bucket: "${GCP_PROJECT_ID}-nexus-forge-temp"
+    
+  # AI Platform
+  ai_platform:
+    endpoint: "us-central1-aiplatform.googleapis.com"
+    timeout: 300
+    retry_attempts: 3
+    
+  # Secret Manager
+  secret_manager:
+    enabled: true
+    cache_ttl: 3600
+
+# =============================================================================
+# AI Service Configuration
+# =============================================================================
+ai_services:
+  # Gemini Configuration
+  gemini:
+    api_key: "${GEMINI_API_KEY}"
+    model: "gemini-1.5-pro"
+    temperature: 0.7
+    max_tokens: 8192
+    timeout: 120
+    retry_attempts: 3
+    rate_limit: "100/minute"
+    
+  # Imagen Configuration
+  imagen:
+    model: "imagen-3.0-generate-001"
+    timeout: 180
+    retry_attempts: 2
+    max_image_size: "1024x1024"
+    supported_formats: ["jpg", "png", "webp"]
+    
+  # Veo Configuration
+  veo:
+    model: "veo-001"
+    timeout: 300
+    retry_attempts: 2
+    max_duration: 30
+    max_resolution: "1920x1080"
+    supported_formats: ["mp4", "mov"]
+
+# =============================================================================
+# Caching Configuration
+# =============================================================================
+cache:
+  # Application Cache
+  app_cache:
+    backend: "redis"
+    default_timeout: 3600
+    key_prefix: "nexus_forge:"
+    version: 1
+    
+  # API Response Cache
+  api_cache:
+    enabled: true
+    timeout: 300
+    max_size: 1000
+    
+  # File Cache
+  file_cache:
+    enabled: true
+    timeout: 86400  # 24 hours
+    max_size: "1GB"
+    cleanup_interval: 3600
+
+# =============================================================================
+# Monitoring and Logging
+# =============================================================================
+monitoring:
+  # Metrics
+  metrics:
+    enabled: true
+    endpoint: "0.0.0.0:8090"
+    path: "/metrics"
+    
+  # Health Checks
+  health_checks:
+    enabled: true
+    endpoint: "/health"
+    detailed_endpoint: "/health/detailed"
+    
+  # Prometheus Integration
+  prometheus:
+    enabled: true
+    job_name: "nexus-forge"
+    scrape_interval: "15s"
+    
+  # Google Cloud Monitoring
+  cloud_monitoring:
+    enabled: true
+    project_id: "${GCP_PROJECT_ID}"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"
+  
+  # Structured Logging
+  structured:
+    enabled: true
+    include_fields:
+      - "timestamp"
+      - "level"
+      - "logger"
+      - "message"
+      - "request_id"
+      - "user_id"
+      - "trace_id"
+      
+  # Log Destinations
+  handlers:
+    console:
+      enabled: true
+      level: "INFO"
+      format: "json"
+      
+    file:
+      enabled: false  # Disabled in production (using Cloud Logging)
+      
+    cloud_logging:
+      enabled: true
+      project_id: "${GCP_PROJECT_ID}"
+      
+  # Request Logging
+  access_logs:
+    enabled: true
+    format: "combined"
+    include_sensitive: false
+
+# =============================================================================
+# File Upload Configuration
+# =============================================================================
+uploads:
+  # General Settings
+  max_file_size: 52428800  # 50MB
+  allowed_extensions:
+    images: ["jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff"]
+    videos: ["mp4", "mov", "avi", "mkv", "webm"]
+    audio: ["mp3", "wav", "flac", "aac", "ogg"]
+    documents: ["pdf", "txt", "docx", "pptx"]
+    
+  # Storage Settings
+  storage:
+    backend: "gcs"  # Google Cloud Storage
+    temp_dir: "/tmp/uploads"
+    cleanup_interval: 3600
+    
+  # Processing Settings
+  processing:
+    enabled: true
+    async_processing: true
+    queue_name: "file-processing"
+    timeout: 600
+
+# =============================================================================
+# API Configuration
+# =============================================================================
+api:
+  # Versioning
+  version: "v1"
+  base_path: "/api/v1"
+  
+  # Documentation
+  docs:
+    enabled: true
+    path: "/docs"
+    redoc_path: "/redoc"
+    openapi_path: "/openapi.json"
+    
+  # Request/Response Settings
+  request:
+    max_body_size: 52428800  # 50MB
+    timeout: 300
+    
+  response:
+    include_request_id: true
+    include_processing_time: true
+    
+  # Authentication
+  auth:
+    enabled: true
+    jwt_algorithm: "HS256"
+    token_expiry: 86400  # 24 hours
+    refresh_token_expiry: 2592000  # 30 days
+
+# =============================================================================
+# Background Tasks Configuration
+# =============================================================================
+tasks:
+  # Task Queue
+  queue:
+    backend: "redis"
+    broker_url: "${REDIS_URL}"
+    result_backend: "${REDIS_URL}"
+    
+  # Worker Configuration
+  workers:
+    concurrency: 4
+    max_tasks_per_child: 1000
+    task_time_limit: 3600
+    task_soft_time_limit: 3000
+    
+  # Scheduled Tasks
+  schedule:
+    cleanup_temp_files:
+      cron: "0 2 * * *"  # Daily at 2 AM
+      task: "cleanup_temp_files"
+      
+    health_check:
+      cron: "*/5 * * * *"  # Every 5 minutes
+      task: "health_check"
+      
+    metrics_collection:
+      cron: "*/1 * * * *"  # Every minute
+      task: "collect_metrics"
+
+# =============================================================================
+# Feature Flags
+# =============================================================================
+features:
+  image_generation: true
+  video_generation: true
+  3d_generation: false  # Coming soon
+  audio_generation: false  # Coming soon
+  batch_processing: true
+  webhooks: true
+  api_analytics: true
+  user_analytics: true
+  experimental_features: false
+
+# =============================================================================
+# Performance Configuration
+# =============================================================================
+performance:
+  # Connection Pooling
+  connection_pool:
+    size: 20
+    overflow: 10
+    timeout: 30
+    
+  # Async Processing
+  async:
+    max_workers: 8
+    queue_size: 1000
+    
+  # Memory Management
+  memory:
+    max_memory_per_request: "500MB"
+    cleanup_threshold: "1GB"
+    
+  # Timeouts
+  timeouts:
+    database: 30
+    external_api: 120
+    file_upload: 300
+    processing: 600
+
+# =============================================================================
+# Alerts and Notifications
+# =============================================================================
+alerts:
+  # Email Notifications
+  email:
+    enabled: true
+    smtp_host: "${SMTP_HOST}"
+    smtp_port: 587
+    smtp_user: "${SMTP_USER}"
+    smtp_password: "${SMTP_PASSWORD}"
+    from_email: "alerts@nexus-forge.example.com"
+    
+  # Slack Integration
+  slack:
+    enabled: true
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    channel: "#alerts"
+    
+  # Alert Thresholds
+  thresholds:
+    error_rate: 0.05  # 5%
+    response_time: 2000  # 2 seconds
+    memory_usage: 0.8  # 80%
+    cpu_usage: 0.8  # 80%
+    disk_usage: 0.85  # 85%

@@ -1,0 +1,126 @@
+PARALLAX PAL SOFTWARE LICENSE AGREEMENT
+
+© 2025 Parallax Analytics, LLC. All Rights Reserved.
+
+Version 2.0, May 2025
+
+IMPORTANT: THIS SOFTWARE LICENSE AGREEMENT ("AGREEMENT") GOVERNS YOUR ACQUISITION AND USE OF THE PARALLAX PAL SOFTWARE ("SOFTWARE"). BY ACCEPTING THIS AGREEMENT, EITHER BY CLICKING A BOX INDICATING YOUR ACCEPTANCE OR BY EXECUTING AN ORDER FORM THAT REFERENCES THIS AGREEMENT, YOU AGREE TO THE TERMS OF THIS AGREEMENT. IF YOU ARE ENTERING INTO THIS AGREEMENT ON BEHALF OF A COMPANY OR OTHER LEGAL ENTITY, YOU REPRESENT THAT YOU HAVE THE AUTHORITY TO BIND SUCH ENTITY TO THESE TERMS AND CONDITIONS.
+
+1. DEFINITIONS
+   "Software" refers to the Parallax Pal AI Research Assistant and all associated files.
+   "Licensor" means Parallax Analytics, LLC.
+   "Licensee" refers to the individual or organization using the Software.
+
+2. LICENSE TIERS
+
+   2.1 FREE TIER
+   - Basic research capabilities
+   - Limited to 10 queries per month
+   - Non-commercial use only
+   - Community support via public forums
+   - Ad-supported interface
+
+   2.2 BASIC TIER ($35.99/month or $359.90/year)
+   - Ad-free experience
+   - Email support
+   - Basic analytics
+   - 50 queries per month
+   - Up to 5 continuous research tasks per month
+   - Limited commercial use permitted
+
+   2.3 PRO TIER ($95.99/month or $959.90/year)
+   - Advanced research features
+   - GPU acceleration for faster results
+   - Priority support
+   - 500 queries per month
+   - Up to 20 continuous research tasks per month
+   - Advanced visualization tools
+   - Full commercial use permitted
+
+   2.4 ENTERPRISE TIER (Custom Pricing)
+   - All Pro features
+   - Dedicated support team
+   - API access with custom rate limits
+   - Custom analytics dashboard
+   - Team collaboration features
+   - Unlimited commercial use
+   - Custom integrations permitted
+
+   2.5 PRIVACY PLAN ($1,499 one-time purchase + $599 annual renewal)
+   - All Pro features
+   - Local model configuration via Ollama
+   - Unlimited continuous research
+   - Full data sovereignty
+   - 6 months of Pro subscription included
+   - Full commercial use permitted
+
+3. LICENSE GRANT
+
+   3.1 Subject to your compliance with this Agreement and payment of applicable fees, Parallax Analytics, LLC grants you a non-exclusive, non-transferable license to:
+      (a) Install and use the Software in accordance with the Documentation and solely for your internal business operations.
+      (b) Make a reasonable number of copies of the Software for backup and archival purposes.
+
+   3.2 The license granted herein is subject to the following restrictions:
+      (a) You shall not license, sublicense, sell, resell, rent, lease, transfer, assign, distribute, or otherwise commercially exploit the Software.
+      (b) You shall not modify, make derivative works of, disassemble, reverse compile, or reverse engineer any part of the Software.
+      (c) You shall not access the Software in order to build a similar or competitive product or service.
+      (d) You shall not use the Software beyond the scope of your purchased tier.
+
+4. PROPRIETARY RIGHTS
+
+   4.1 Parallax Analytics, LLC and its licensors own all right, title, and interest in and to the Software, including all related intellectual property rights.
+   
+   4.2 This Agreement does not grant you any rights to trademarks, service marks, or logos of Parallax Analytics, LLC.
+
+5. CONFIDENTIALITY
+
+   5.1 "Confidential Information" means all information disclosed by Parallax Analytics, LLC to you, whether orally or in writing, that is designated as confidential or that reasonably should be understood to be confidential given the nature of the information and the circumstances of disclosure.
+   
+   5.2 You will not disclose or use any Confidential Information for any purpose outside the scope of this Agreement without the prior written consent of Parallax Analytics, LLC.
+
+6. COMMERCIAL USE PROVISIONS
+   - Commercial use is strictly limited to the Basic, Pro, Enterprise, and Privacy Plan license tiers
+   - Proof of active subscription or perpetual license is required for commercial applications
+   - Commercial use without proper licensing is prohibited and may result in legal action
+
+7. WARRANTY DISCLAIMER
+
+   7.1 THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+8. LIMITATION OF LIABILITY
+
+   8.1 IN NO EVENT SHALL PARALLAX ANALYTICS, LLC BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
+
+9. TERM AND TERMINATION
+
+   9.1 This Agreement commences on the date you first accept it and continues until terminated as set forth herein.
+   
+   9.2 Parallax Analytics, LLC may terminate this Agreement if you breach any material term of this Agreement and such breach is not cured within 30 days of notice.
+   
+   9.3 Upon termination of this Agreement for any reason, you shall cease all use of the Software and destroy all copies of the Software in your possession.
+
+10. GOVERNING LAW
+
+   10.1 This Agreement shall be governed by the laws of the State of Delaware without regard to its conflict of law principles.
+
+11. THIRD-PARTY COMPONENTS
+
+   11.1 The Software may incorporate certain third-party open source software components, each of which is licensed under its respective terms.
+   
+   11.2 A list of these components and their licenses is available in the THIRD_PARTY_LICENSES.md file.
+
+12. DERIVATIVE WORK ACKNOWLEDGEMENT
+   This project contains derivative work from TheBlewish's Automated-AI-Web-Research-Ollama.
+
+13. MISCELLANEOUS
+
+   13.1 This Agreement constitutes the entire agreement between the parties concerning the subject matter hereof and supersedes all prior and contemporaneous agreements and communications.
+    
+   13.2 This Agreement may not be amended except in a writing signed by both parties.
+
+For licensing inquiries, please contact:
+licensing@parallaxanalytics.com
+
+By using this Software, you agree to these terms.
+
+Effective Date: May 19, 2025
