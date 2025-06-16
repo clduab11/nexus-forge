@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 import secrets
 
-from ...models import User
+from ...models import User, RefreshToken, APIKey
 from ..schemas.auth import TokenData
 from ...config import settings
 from .database import get_db
@@ -32,6 +32,15 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password: str) -> str:
     """Generate password hash"""
     return pwd_context.hash(password)
+
+def authenticate_user(db: Session, email: str, password: str) -> Union[User, None]:
+    """Authenticate user with email and password"""
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return None
+    if not verify_password(password, user.hashed_password):
+        return None
+    return user
 
 def create_access_token(
     data: dict,

@@ -24,6 +24,32 @@ os.environ['VEO_OUTPUT_BUCKET'] = 'test-veo-bucket'
 os.environ['DATABASE_URL'] = 'sqlite:///test.db'
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/tmp/test-credentials.json'
 
+# Override configuration for testing
+os.environ['REDIS_PASSWORD'] = 'test-password'
+os.environ['GOOGLE_CLIENT_ID'] = 'test-google-client-id'
+os.environ['GOOGLE_CLIENT_SECRET'] = 'test-google-client-secret'
+os.environ['GOOGLE_REDIRECT_URI'] = 'http://localhost:8000/auth/google/callback'
+os.environ['GITHUB_CLIENT_ID'] = 'test-github-client-id'
+os.environ['GITHUB_CLIENT_SECRET'] = 'test-github-client-secret'
+os.environ['GITHUB_REDIRECT_URI'] = 'http://localhost:8000/auth/github/callback'
+os.environ['FACEBOOK_CLIENT_ID'] = 'test-facebook-client-id'
+os.environ['FACEBOOK_CLIENT_SECRET'] = 'test-facebook-client-secret'
+os.environ['FACEBOOK_REDIRECT_URI'] = 'http://localhost:8000/auth/facebook/callback'
+os.environ['INSTAGRAM_CLIENT_ID'] = 'test-instagram-client-id'
+os.environ['INSTAGRAM_CLIENT_SECRET'] = 'test-instagram-client-secret'
+os.environ['INSTAGRAM_REDIRECT_URI'] = 'http://localhost:8000/auth/instagram/callback'
+os.environ['SMTP_HOST'] = 'smtp.test.com'
+os.environ['SMTP_PORT'] = '587'
+os.environ['SMTP_USER'] = 'test@test.com'
+os.environ['SMTP_PASSWORD'] = 'test-password'
+os.environ['SMTP_FROM_EMAIL'] = 'noreply@test.com'
+os.environ['STRIPE_SECRET_KEY'] = 'sk_test_test_key'
+os.environ['STRIPE_PUBLISHABLE_KEY'] = 'pk_test_test_key'
+os.environ['STRIPE_WEBHOOK_SECRET'] = 'whsec_test_secret'
+os.environ['SENTRY_DSN'] = 'https://test@sentry.io/test'
+os.environ['SSL_KEYFILE'] = '/tmp/test.key'
+os.environ['SSL_CERTFILE'] = '/tmp/test.cert'
+
 # Import after setting environment variables
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine

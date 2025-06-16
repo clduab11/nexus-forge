@@ -6,17 +6,17 @@ from fastapi import HTTPException, status
 import jwt
 from jwt.exceptions import PyJWTError
 
-from ..models import User, RefreshToken
-from ..schemas.auth import UserCreate, Token
-from ..schemas.oauth import OAuthProvider, OAuthUserData
-from ..dependencies.oauth import (
+from ...models import User, RefreshToken
+from ...api.schemas.auth import UserCreate, Token
+from ...api.schemas.oauth import OAuthProvider, OAuthUserData
+from ...api.dependencies.oauth import (
     google_oauth,
     github_oauth,
     facebook_oauth,
     instagram_oauth
 )
-from ..config import settings
-from ..utils.security import (
+from ...config import settings
+from ...api.dependencies.auth import (
     get_password_hash,
     verify_password,
     create_access_token,
