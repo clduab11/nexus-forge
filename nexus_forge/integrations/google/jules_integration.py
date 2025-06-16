@@ -10,20 +10,21 @@ Integrates with Jules (jules.google) - Google's autonomous coding agent that:
 """
 
 import asyncio
-import os
-import logging
-from typing import Dict, Any, List, Optional
-from dataclasses import dataclass
-from enum import Enum
-import aiohttp
 import json
+import logging
+import os
+from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
+import aiohttp
 
 from nexus_forge.core.caching_decorators import (
-    cache_ai_response, 
-    CacheStrategy, 
+    CacheStrategy,
+    cache_ai_response,
+    conditional_cache,
     invalidate_cache,
-    conditional_cache
 )
 
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ logger = logging.getLogger(__name__)
 
 class TaskType(Enum):
     """Types of coding tasks Jules can perform"""
+
     BUG_FIX = "bug_fix"
     FEATURE_BUILD = "feature_build"
     TESTS = "tests"
@@ -42,6 +44,7 @@ class TaskType(Enum):
 @dataclass
 class JulesTask:
     """Represents a coding task for Jules"""
+
     prompt: str
     task_type: TaskType
     repository: str
@@ -54,6 +57,7 @@ class JulesTask:
 @dataclass
 class JulesTaskResult:
     """Result from Jules task execution"""
+
     task_id: str
     status: str  # "pending", "in_progress", "completed", "failed"
     pr_url: Optional[str]
@@ -67,18 +71,18 @@ class JulesTaskResult:
 class JulesIntegration:
     """
     Integration with Google's Jules autonomous coding agent.
-    
+
     Jules works differently from traditional coding assistants:
     - Asynchronous execution in Google Cloud VMs
     - Full repository context understanding
     - GitHub-native workflow with PRs
     - Task-based approach rather than chat-based
     """
-    
+
     def __init__(self, github_token: str, jules_api_key: Optional[str] = None):
         """
         Initialize Jules integration.
-        
+
         Args:
             github_token: GitHub personal access token for repository access
             jules_api_key: Jules API key (if available)
@@ -87,48 +91,48 @@ class JulesIntegration:
         self.jules_api_key = jules_api_key or os.getenv("JULES_API_KEY")
         self.base_url = "https://api.jules.google"
         self.github_api_url = "https://api.github.com"
-        
+
         # Jules task tracking
         self.active_tasks: Dict[str, JulesTask] = {}
         self.task_results: Dict[str, JulesTaskResult] = {}
-        
+
     @cache_ai_response(
         ttl=3600,  # 1 hour for task creation
         strategy=CacheStrategy.SIMPLE,
-        cache_tag="jules_tasks"
+        cache_tag="jules_tasks",
     )
     async def create_coding_task(self, task: JulesTask) -> str:
         """
         Create a new coding task for Jules to execute.
-        
+
         Based on Jules workflow:
         1. Repository is imported/cloned to Cloud VM
         2. Jules analyzes the codebase with Gemini 2.5 Pro
         3. Creates execution plan
         4. Performs coding task
         5. Creates PR with changes
-        
+
         Args:
             task: JulesTask with prompt and repository info
-            
+
         Returns:
             task_id: Unique identifier for tracking the task
         """
         task_id = f"jules_task_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        
+
         # Optimize prompt based on task type
         optimized_prompt = self._optimize_prompt_for_jules(task)
-        
+
         # Since Jules API isn't publicly documented, we'll simulate the workflow
         # In production, this would use the actual Jules API endpoints
         logger.info(f"Creating Jules task: {task_id}")
         logger.info(f"Repository: {task.repository}")
         logger.info(f"Task type: {task.task_type.value}")
         logger.info(f"Optimized prompt: {optimized_prompt}")
-        
+
         # Store task for tracking
         self.active_tasks[task_id] = task
-        
+
         # Initialize result tracking
         self.task_results[task_id] = JulesTaskResult(
             task_id=task_id,
@@ -138,51 +142,51 @@ class JulesIntegration:
             audio_summary_url=None,
             files_changed=[],
             test_results=None,
-            completion_time=None
+            completion_time=None,
         )
-        
+
         # Start async task execution (simulated)
         asyncio.create_task(self._execute_jules_task(task_id, task, optimized_prompt))
-        
+
         return task_id
-    
+
     @cache_ai_response(
         ttl=300,  # 5 minutes for task status (frequently updated)
         strategy=CacheStrategy.SIMPLE,
-        cache_tag="jules_status"
+        cache_tag="jules_status",
     )
     async def get_task_status(self, task_id: str) -> Optional[JulesTaskResult]:
         """
         Get the current status of a Jules task.
-        
+
         Args:
             task_id: Task identifier
-            
+
         Returns:
             JulesTaskResult with current status and results
         """
         return self.task_results.get(task_id)
-    
+
     async def list_active_tasks(self) -> List[JulesTaskResult]:
         """
         List all active Jules tasks and their statuses.
-        
+
         Returns:
             List of JulesTaskResult objects
         """
         return list(self.task_results.values())
-    
+
     @invalidate_cache(
         patterns=["jules_tasks:*", "jules_status:*"],
-        tags=["jules_tasks", "jules_status"]
+        tags=["jules_tasks", "jules_status"],
     )
     async def cancel_task(self, task_id: str) -> bool:
         """
         Cancel an active Jules task.
-        
+
         Args:
             task_id: Task identifier
-            
+
         Returns:
             True if successfully cancelled
         """
@@ -191,15 +195,15 @@ class JulesIntegration:
             logger.info(f"Cancelled Jules task: {task_id}")
             return True
         return False
-    
+
     def _optimize_prompt_for_jules(self, task: JulesTask) -> str:
         """
         Optimize the prompt based on task type for better Jules performance.
-        
+
         Different task types require different prompt structures for optimal results.
         """
         base_prompt = task.prompt
-        
+
         if task.task_type == TaskType.BUG_FIX:
             return f"""
 Bug Fix Task: {base_prompt}
@@ -211,7 +215,7 @@ Please:
 4. Ensure existing tests still pass
 5. Provide clear commit messages explaining the fix
 """
-        
+
         elif task.task_type == TaskType.FEATURE_BUILD:
             return f"""
 Feature Development Task: {base_prompt}
@@ -223,7 +227,7 @@ Please:
 4. Update documentation and type definitions
 5. Follow existing code style and conventions
 """
-        
+
         elif task.task_type == TaskType.TESTS:
             return f"""
 Test Creation Task: {base_prompt}
@@ -235,7 +239,7 @@ Please:
 4. Ensure high test coverage (>80%)
 5. Add performance and security test cases where relevant
 """
-        
+
         elif task.task_type == TaskType.VERSION_BUMP:
             return f"""
 Version Update Task: {base_prompt}
@@ -247,7 +251,7 @@ Please:
 4. Run full test suite to ensure stability
 5. Update documentation if APIs have changed
 """
-        
+
         elif task.task_type == TaskType.DEPENDENCY_UPDATE:
             return f"""
 Dependency Update Task: {base_prompt}
@@ -259,7 +263,7 @@ Please:
 4. Ensure all tests pass with new dependencies
 5. Update documentation for any API changes
 """
-        
+
         else:  # CODE_REFACTOR
             return f"""
 Code Refactoring Task: {base_prompt}
@@ -271,11 +275,13 @@ Please:
 4. Ensure all tests continue to pass
 5. Add comments explaining complex refactoring decisions
 """
-    
-    async def _execute_jules_task(self, task_id: str, task: JulesTask, optimized_prompt: str):
+
+    async def _execute_jules_task(
+        self, task_id: str, task: JulesTask, optimized_prompt: str
+    ):
         """
         Execute a Jules task asynchronously.
-        
+
         This simulates the Jules workflow:
         1. Clone repository to Cloud VM
         2. Analyze codebase with Gemini 2.5 Pro
@@ -285,78 +291,92 @@ Please:
         6. Create PR
         """
         result = self.task_results[task_id]
-        
+
         try:
             # Phase 1: Repository analysis
             result.status = "analyzing_repository"
             await asyncio.sleep(2)  # Simulate analysis time
-            
+
             logger.info(f"Jules analyzing repository: {task.repository}")
-            
+
             # Phase 2: Plan creation
             result.status = "creating_plan"
             await asyncio.sleep(1)
-            
+
             execution_plan = await self._create_execution_plan(task, optimized_prompt)
             logger.info(f"Jules execution plan: {execution_plan}")
-            
+
             # Phase 3: Code execution
             result.status = "executing_changes"
             await asyncio.sleep(5)  # Simulate coding time
-            
+
             # Simulate file changes based on task type
             result.files_changed = self._simulate_file_changes(task.task_type)
-            
+
             # Phase 4: Test execution
             result.status = "running_tests"
             await asyncio.sleep(3)
-            
+
             result.test_results = await self._simulate_test_execution(task.task_type)
-            
+
             # Phase 5: PR creation
             result.status = "creating_pr"
             await asyncio.sleep(1)
-            
+
             result.pr_url = await self._create_github_pr(task, result)
             result.diff_summary = self._generate_diff_summary(task.task_type)
             result.audio_summary_url = f"https://jules.google/audio/{task_id}"
-            
+
             # Task completion
             result.status = "completed"
             result.completion_time = datetime.now()
-            
+
             logger.info(f"Jules task completed: {task_id}")
             logger.info(f"PR created: {result.pr_url}")
-            
+
         except Exception as e:
             result.status = "failed"
             logger.error(f"Jules task failed: {task_id}, Error: {str(e)}")
-    
-    async def _create_execution_plan(self, task: JulesTask, prompt: str) -> Dict[str, Any]:
+
+    async def _create_execution_plan(
+        self, task: JulesTask, prompt: str
+    ) -> Dict[str, Any]:
         """Create detailed execution plan using Gemini 2.5 Pro analysis"""
         return {
             "task_type": task.task_type.value,
             "estimated_files": len(self._simulate_file_changes(task.task_type)),
             "test_strategy": "comprehensive",
             "risk_level": "low",
-            "estimated_time": "5-15 minutes"
+            "estimated_time": "5-15 minutes",
         }
-    
+
     def _simulate_file_changes(self, task_type: TaskType) -> List[str]:
         """Simulate which files would be changed based on task type"""
         if task_type == TaskType.BUG_FIX:
-            return ["src/components/UserForm.tsx", "src/utils/validation.ts", "tests/UserForm.test.tsx"]
+            return [
+                "src/components/UserForm.tsx",
+                "src/utils/validation.ts",
+                "tests/UserForm.test.tsx",
+            ]
         elif task_type == TaskType.FEATURE_BUILD:
-            return ["src/features/NewFeature.tsx", "src/api/newFeature.ts", "src/types/index.ts", 
-                   "tests/NewFeature.test.tsx", "docs/API.md"]
+            return [
+                "src/features/NewFeature.tsx",
+                "src/api/newFeature.ts",
+                "src/types/index.ts",
+                "tests/NewFeature.test.tsx",
+                "docs/API.md",
+            ]
         elif task_type == TaskType.TESTS:
-            return ["tests/unit/component.test.ts", "tests/integration/api.test.ts", 
-                   "tests/e2e/workflow.test.ts"]
+            return [
+                "tests/unit/component.test.ts",
+                "tests/integration/api.test.ts",
+                "tests/e2e/workflow.test.ts",
+            ]
         elif task_type == TaskType.VERSION_BUMP:
             return ["package.json", "package-lock.json", "src/config/version.ts"]
         else:
             return ["src/refactored/module.ts", "tests/refactored.test.ts"]
-    
+
     async def _simulate_test_execution(self, task_type: TaskType) -> Dict[str, Any]:
         """Simulate test execution results"""
         return {
@@ -365,17 +385,17 @@ Please:
             "tests_failed": 0,
             "coverage": "92%",
             "duration": "2.3s",
-            "status": "passed"
+            "status": "passed",
         }
-    
+
     async def _create_github_pr(self, task: JulesTask, result: JulesTaskResult) -> str:
         """Create GitHub PR with Jules changes"""
         # In production, this would use GitHub API to create actual PR
-        repo_name = task.repository.split('/')[-1]
+        repo_name = task.repository.split("/")[-1]
         pr_number = f"{datetime.now().strftime('%Y%m%d%H%M')}"
-        
+
         return f"https://github.com/{task.repository}/pull/{pr_number}"
-    
+
     def _generate_diff_summary(self, task_type: TaskType) -> str:
         """Generate human-readable diff summary"""
         if task_type == TaskType.BUG_FIX:
@@ -393,26 +413,26 @@ Please:
 class JulesWorkflowManager:
     """
     Manages Jules workflows for Nexus Forge app generation.
-    
+
     Coordinates Jules tasks for different phases of app development.
     """
-    
+
     def __init__(self, jules_integration: JulesIntegration):
         self.jules = jules_integration
-        
+
     @cache_ai_response(
         ttl=43200,  # 12 hours for app code generation
         strategy=CacheStrategy.COMPRESSED,  # Large code responses
-        cache_tag="jules_app_generation"
+        cache_tag="jules_app_generation",
     )
     async def generate_app_code(self, app_spec: Dict[str, Any], repository: str) -> str:
         """
         Use Jules to generate complete application code based on specification.
-        
+
         Args:
             app_spec: Application specification from Starri orchestrator
             repository: Target GitHub repository
-            
+
         Returns:
             Task ID for tracking the code generation
         """
@@ -434,31 +454,31 @@ Requirements:
 7. Ensure responsive design and accessibility compliance
 8. Add proper logging and monitoring setup
 """
-        
+
         task = JulesTask(
             prompt=prompt,
             task_type=TaskType.FEATURE_BUILD,
             repository=repository,
             branch="nexus-forge-generated",
             priority="high",
-            estimated_time="15-30 minutes"
+            estimated_time="15-30 minutes",
         )
-        
+
         return await self.jules.create_coding_task(task)
-    
+
     @cache_ai_response(
         ttl=21600,  # 6 hours for test suite creation
         strategy=CacheStrategy.COMPRESSED,
-        cache_tag="jules_test_generation"
+        cache_tag="jules_test_generation",
     )
     async def create_test_suite(self, repository: str, branch: str = "main") -> str:
         """
         Create comprehensive test suite for existing code.
-        
+
         Args:
             repository: GitHub repository
             branch: Source branch to test
-            
+
         Returns:
             Task ID for tracking test creation
         """
@@ -482,35 +502,35 @@ Focus on:
 - UI component behavior
 - Business logic validation
 """
-        
+
         task = JulesTask(
             prompt=prompt,
             task_type=TaskType.TESTS,
             repository=repository,
             branch=branch,
-            priority="high"
+            priority="high",
         )
-        
+
         return await self.jules.create_coding_task(task)
-    
+
     @conditional_cache(
         condition_func=lambda result: result is not None,
         ttl=7200,  # 2 hours for bug fixes
-        strategy=CacheStrategy.SIMPLE
+        strategy=CacheStrategy.SIMPLE,
     )
     async def fix_bugs_and_optimize(self, repository: str, issues: List[str]) -> str:
         """
         Fix identified bugs and optimize code performance.
-        
+
         Args:
             repository: GitHub repository
             issues: List of issues/bugs to fix
-            
+
         Returns:
             Task ID for tracking bug fixes
         """
-        issues_text = '\n'.join(f"- {issue}" for issue in issues)
-        
+        issues_text = "\n".join(f"- {issue}" for issue in issues)
+
         prompt = f"""
 Fix the following bugs and optimize code performance:
 
@@ -526,15 +546,17 @@ Please:
 6. Update documentation where necessary
 7. Ensure backward compatibility
 """
-        
+
         task = JulesTask(
             prompt=prompt,
             task_type=TaskType.BUG_FIX,
             repository=repository,
             branch="bug-fixes-optimization",
-            priority="high"
+            priority="high",
         )
-        
+
         task_id = await self.jules.create_coding_task(task)
-        logger.info(f"Created bug fix task {task_id} for {len(issues)} issues in {repository}")
+        logger.info(
+            f"Created bug fix task {task_id} for {len(issues)} issues in {repository}"
+        )
         return task_id

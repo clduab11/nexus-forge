@@ -1,10 +1,24 @@
 from datetime import datetime
 from enum import Enum as PyEnum
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text, DateTime, Enum, Float, JSON, ARRAY
+
+from sqlalchemy import (
+    ARRAY,
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from .database import Base
+
 
 class ResearchStatus(str, PyEnum):
     PENDING = "pending"
@@ -12,10 +26,12 @@ class ResearchStatus(str, PyEnum):
     COMPLETED = "completed"
     FAILED = "failed"
 
+
 class UserRole(str, PyEnum):
     ADMIN = "admin"
     RESEARCHER = "researcher"
     VIEWER = "viewer"
+
 
 class SubscriptionStatus(str, PyEnum):
     ACTIVE = "active"
@@ -24,22 +40,26 @@ class SubscriptionStatus(str, PyEnum):
     UNPAID = "unpaid"
     TRIALING = "trialing"
 
+
 class PaymentStatus(str, PyEnum):
     PENDING = "pending"
     COMPLETED = "completed"
     FAILED = "failed"
     REFUNDED = "refunded"
 
+
 class QueryPurchaseType(str, PyEnum):
     SINGLE = "single"
     PACK_5 = "pack_5"
     PACK_10 = "pack_10"
+
 
 class AIModelType(str, PyEnum):
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     GEMINI = "gemini"
     OLLAMA = "ollama"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -55,7 +75,7 @@ class User(Base):
     mfa_secret = Column(String, nullable=True)
     is_mfa_enabled = Column(Boolean, default=False)
     stripe_customer_id = Column(String, nullable=True)
-    
+
     # Relationships
     research_tasks = relationship("ResearchTask", back_populates="owner")
     api_keys = relationship("APIKey", back_populates="user")
@@ -63,6 +83,7 @@ class User(Base):
     subscriptions = relationship("Subscription", back_populates="user")
     payment_methods = relationship("PaymentMethod", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
+
 
 class SubscriptionPlan(Base):
     __tablename__ = "subscription_plans"
@@ -77,10 +98,13 @@ class SubscriptionPlan(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    allows_ollama = Column(Boolean, default=False)  # Whether plan includes Ollama access
+    allows_ollama = Column(
+        Boolean, default=False
+    )  # Whether plan includes Ollama access
 
     # Relationships
     subscriptions = relationship("Subscription", back_populates="plan")
+
 
 class Subscription(Base):
     __tablename__ = "subscriptions"
@@ -101,6 +125,7 @@ class Subscription(Base):
     user = relationship("User", back_populates="subscriptions")
     plan = relationship("SubscriptionPlan", back_populates="subscriptions")
 
+
 class PaymentMethod(Base):
     __tablename__ = "payment_methods"
 
@@ -117,6 +142,7 @@ class PaymentMethod(Base):
 
     # Relationships
     user = relationship("User", back_populates="payment_methods")
+
 
 class Transaction(Base):
     __tablename__ = "transactions"
@@ -136,7 +162,10 @@ class Transaction(Base):
 
     # Relationships
     user = relationship("User", back_populates="transactions")
-    query_purchase = relationship("QueryPurchase", back_populates="transaction", uselist=False)
+    query_purchase = relationship(
+        "QueryPurchase", back_populates="transaction", uselist=False
+    )
+
 
 class QueryPurchase(Base):
     __tablename__ = "query_purchases"
@@ -155,17 +184,21 @@ class QueryPurchase(Base):
     user = relationship("User", backref="query_purchases")
     transaction = relationship("Transaction", back_populates="query_purchase")
 
+
 class QueryCredit(Base):
     __tablename__ = "query_credits"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     remaining_queries = Column(Integer, default=0)
-    last_updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-    
+    last_updated = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
     # Relationships
     user = relationship("User", backref="query_credits")
     usage_history = relationship("QueryUsage", back_populates="credit")
+
 
 class QueryUsage(Base):
     __tablename__ = "query_usage"
@@ -174,10 +207,11 @@ class QueryUsage(Base):
     credit_id = Column(Integer, ForeignKey("query_credits.id"))
     task_id = Column(Integer, ForeignKey("research_tasks.id"))
     used_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+
     # Relationships
     credit = relationship("QueryCredit", back_populates="usage_history")
     task = relationship("ResearchTask", backref="query_usage")
+
 
 class ResearchTask(Base):
     __tablename__ = "research_tasks"
@@ -194,18 +228,19 @@ class ResearchTask(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     completed_at = Column(DateTime(timezone=True), nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
-    
+
     # New fields for multi-model support
     web_results = Column(JSON, nullable=True)  # Store web results with snippets
     ai_analyses = Column(JSON, nullable=True)  # Store analyses from different models
     models_used = Column(ARRAY(String), nullable=True)  # Track which models were used
     used_ollama = Column(Boolean, default=False)  # Track Ollama usage
-    
+
     # Relationships
     owner = relationship("User", back_populates="research_tasks")
     analytics = relationship("ResearchAnalytics", back_populates="task", uselist=False)
     sources = relationship("ResearchSource", back_populates="task")
     model_results = relationship("ModelResult", back_populates="task")
+
 
 class ResearchAnalytics(Base):
     __tablename__ = "research_analytics"
@@ -217,15 +252,18 @@ class ResearchAnalytics(Base):
     source_count = Column(Integer)
     model_count = Column(Integer)  # Number of AI models used
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+
     # Performance metrics
     avg_source_processing_time = Column(Float, nullable=True)
     avg_tokens_per_source = Column(Float, nullable=True)
     cache_hit_rate = Column(Float, nullable=True)
-    avg_model_confidence = Column(Float, nullable=True)  # Average confidence across models
-    
+    avg_model_confidence = Column(
+        Float, nullable=True
+    )  # Average confidence across models
+
     # Relationships
     task = relationship("ResearchTask", back_populates="analytics")
+
 
 class ResearchSource(Base):
     __tablename__ = "research_sources"
@@ -239,10 +277,11 @@ class ResearchSource(Base):
     relevance_score = Column(Float)
     processed_at = Column(DateTime(timezone=True), server_default=func.now())
     processing_time = Column(Integer)  # in milliseconds
-    
+
     # Relationships
     task = relationship("ResearchTask", back_populates="sources")
     model_analyses = relationship("ModelResult", back_populates="source")
+
 
 class ModelResult(Base):
     __tablename__ = "model_results"
@@ -255,10 +294,11 @@ class ModelResult(Base):
     confidence = Column(Float)
     processing_time = Column(Integer)  # in milliseconds
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
+
     # Relationships
     task = relationship("ResearchTask", back_populates="model_results")
     source = relationship("ResearchSource", back_populates="model_analyses")
+
 
 class APIKey(Base):
     __tablename__ = "api_keys"
@@ -271,9 +311,10 @@ class APIKey(Base):
     expires_at = Column(DateTime(timezone=True), nullable=True)
     last_used = Column(DateTime(timezone=True), nullable=True)
     is_active = Column(Boolean, default=True)
-    
+
     # Relationships
     user = relationship("User", back_populates="api_keys")
+
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
@@ -288,6 +329,7 @@ class RefreshToken(Base):
     # Relationships
     user = relationship("User")
 
+
 class AuditLog(Base):
     __tablename__ = "audit_logs"
 
@@ -301,18 +343,35 @@ class AuditLog(Base):
     user_agent = Column(String)
     details = Column(Text, nullable=True)
 
+
 # Create indexes
 from sqlalchemy import Index
 
-Index('ix_research_tasks_status', ResearchTask.status)
-Index('ix_research_tasks_owner_created', ResearchTask.owner_id, ResearchTask.created_at.desc())
-Index('ix_api_keys_active', APIKey.is_active)
-Index('ix_audit_logs_user_timestamp', AuditLog.user_id, AuditLog.timestamp.desc())
-Index('ix_subscriptions_user_status', Subscription.user_id, Subscription.status)
-Index('ix_transactions_user_created', Transaction.user_id, Transaction.created_at.desc())
-Index('ix_payment_methods_user_default', PaymentMethod.user_id, PaymentMethod.is_default)
-Index('ix_model_results_task_model', ModelResult.task_id, ModelResult.model_type)
-Index('ix_research_sources_task_relevance', ResearchSource.task_id, ResearchSource.relevance_score.desc())
-Index('ix_query_purchases_user_created', QueryPurchase.user_id, QueryPurchase.created_at.desc())
-Index('ix_query_credits_user', QueryCredit.user_id)
-Index('ix_query_usage_credit', QueryUsage.credit_id, QueryUsage.used_at.desc())
+Index("ix_research_tasks_status", ResearchTask.status)
+Index(
+    "ix_research_tasks_owner_created",
+    ResearchTask.owner_id,
+    ResearchTask.created_at.desc(),
+)
+Index("ix_api_keys_active", APIKey.is_active)
+Index("ix_audit_logs_user_timestamp", AuditLog.user_id, AuditLog.timestamp.desc())
+Index("ix_subscriptions_user_status", Subscription.user_id, Subscription.status)
+Index(
+    "ix_transactions_user_created", Transaction.user_id, Transaction.created_at.desc()
+)
+Index(
+    "ix_payment_methods_user_default", PaymentMethod.user_id, PaymentMethod.is_default
+)
+Index("ix_model_results_task_model", ModelResult.task_id, ModelResult.model_type)
+Index(
+    "ix_research_sources_task_relevance",
+    ResearchSource.task_id,
+    ResearchSource.relevance_score.desc(),
+)
+Index(
+    "ix_query_purchases_user_created",
+    QueryPurchase.user_id,
+    QueryPurchase.created_at.desc(),
+)
+Index("ix_query_credits_user", QueryCredit.user_id)
+Index("ix_query_usage_credit", QueryUsage.credit_id, QueryUsage.used_at.desc())

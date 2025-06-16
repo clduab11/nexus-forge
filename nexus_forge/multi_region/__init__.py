@@ -3,18 +3,18 @@ Multi-Region Deployment Module for Nexus Forge
 Provides global infrastructure management and edge optimization
 """
 
-from .region_manager import RegionManager
-from .load_balancer import GlobalLoadBalancer
 from .data_sync import DataSynchronizer
 from .edge_optimizer import EdgeOptimizer
-from .models import Region, RegionConfig, EdgeLocation
+from .load_balancer import GlobalLoadBalancer
+from .models import EdgeLocation, Region, RegionConfig
+from .region_manager import RegionManager
 
 __all__ = [
     "RegionManager",
-    "GlobalLoadBalancer", 
+    "GlobalLoadBalancer",
     "DataSynchronizer",
     "EdgeOptimizer",
     "Region",
     "RegionConfig",
-    "EdgeLocation"
+    "EdgeLocation",
 ]

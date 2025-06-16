@@ -5,43 +5,51 @@ Enhanced FastAPI application with Starri orchestration, real-time WebSocket coor
 and comprehensive Supabase integration for the Google Cloud Multi-Agent Hackathon.
 """
 
-import os
 import logging
+import os
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 from datetime import datetime
+from typing import AsyncGenerator
 
-from fastapi import FastAPI, Request, Depends, HTTPException, status, WebSocket, WebSocketDisconnect
+from fastapi import (
+    Depends,
+    FastAPI,
+    HTTPException,
+    Request,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from prometheus_client import make_asgi_app
 
-# Import routers
-from .api.routers import auth, nexus_forge, adk, health, subscription
+# Starri orchestrator integration
+from .agents.starri.orchestrator import StarriOrchestrator
 from .api.dependencies.auth import get_current_user
-from .models import User
 
 # Security and middleware
 from .api.middleware.rate_limiter import RateLimiter
+
+# Import routers
+from .api.routers import adk, auth, health, nexus_forge, subscription
 from .core.exceptions import NexusForgeError
 
-# WebSocket manager for real-time updates
-from .websockets.manager import WebSocketManager
-
-# Starri orchestrator integration
-from .agents.starri.orchestrator import StarriOrchestrator
+# Monitoring
+from .core.monitoring import setup_monitoring, structured_logger
 
 # State management
 from .core.state import StateManager
-
-# Monitoring
-from .core.monitoring import structured_logger, setup_monitoring
 from .integrations.google.monitoring import CloudMonitoringService
 
 # Supabase integration
 from .integrations.supabase.coordination_client import SupabaseCoordinationClient
+from .models import User
+
+# WebSocket manager for real-time updates
+from .websockets.manager import WebSocketManager
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
@@ -53,58 +61,69 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Enhanced application lifespan manager with Starri orchestration."""
     # Startup
     logger.info("Starting Nexus Forge API with Starri orchestration...")
-    
+
     # Initialize database
     from .database import init_db
+
     await init_db()
-    
+
     # Initialize monitoring
     await setup_monitoring()
-    
+
     # Initialize state management
     app.state.state_manager = StateManager()
-    
+
     # Initialize Supabase coordination client
     app.state.supabase_client = SupabaseCoordinationClient(
         url=os.getenv("SUPABASE_URL", "https://woywcqjbubgkjumqgcqj.supabase.co"),
-        key=os.getenv("SUPABASE_ANON_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndveXdjcWpidWJna2p1bXFnY3FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwMDk1MjUsImV4cCI6MjA2NTU4NTUyNX0.7sau-I1jYaJ4uhaA27O3uS4TlxzucknxvFFi9hU4q5Q"),
-        project_id="woywcqjbubgkjumqgcqj"
+        key=os.getenv(
+            "SUPABASE_ANON_KEY",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndveXdjcWpidWJna2p1bXFnY3FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwMDk1MjUsImV4cCI6MjA2NTU4NTUyNX0.7sau-I1jYaJ4uhaA27O3uS4TlxzucknxvFFi9hU4q5Q",
+        ),
+        project_id="woywcqjbubgkjumqgcqj",
     )
     await app.state.supabase_client.connect()
-    
+
     # Initialize WebSocket manager with Supabase integration
-    app.state.websocket_manager = WebSocketManager(supabase_client=app.state.supabase_client)
-    
+    app.state.websocket_manager = WebSocketManager(
+        supabase_client=app.state.supabase_client
+    )
+
     # Initialize Starri orchestrator
     app.state.starri_orchestrator = StarriOrchestrator(
         project_id=os.getenv("GOOGLE_CLOUD_PROJECT_ID", "nexus-forge-dev"),
-        supabase_url=os.getenv("SUPABASE_URL", "https://woywcqjbubgkjumqgcqj.supabase.co"),
-        supabase_key=os.getenv("SUPABASE_ANON_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndveXdjcWpidWJna2p1bXFnY3FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwMDk1MjUsImV4cCI6MjA2NTU4NTUyNX0.7sau-I1jYaJ4uhaA27O3uS4TlxzucknxvFFi9hU4q5Q"),
+        supabase_url=os.getenv(
+            "SUPABASE_URL", "https://woywcqjbubgkjumqgcqj.supabase.co"
+        ),
+        supabase_key=os.getenv(
+            "SUPABASE_ANON_KEY",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndveXdjcWpidWJna2p1bXFnY3FqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwMDk1MjUsImV4cCI6MjA2NTU4NTUyNX0.7sau-I1jYaJ4uhaA27O3uS4TlxzucknxvFFi9hU4q5Q",
+        ),
         mem0_api_key=os.getenv("MEM0_API_KEY"),
         gemini_api_key=os.getenv("GEMINI_API_KEY"),
-        redis_url=os.getenv("REDIS_URL", "redis://localhost:6379")
+        redis_url=os.getenv("REDIS_URL", "redis://localhost:6379"),
     )
     await app.state.starri_orchestrator.initialize()
-    
+
     logger.info("Nexus Forge API with Starri orchestration started successfully")
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down Nexus Forge API...")
-    
+
     # Cleanup Starri orchestrator
-    if hasattr(app.state, 'starri_orchestrator'):
+    if hasattr(app.state, "starri_orchestrator"):
         await app.state.starri_orchestrator.shutdown()
-    
+
     # Cleanup Supabase connection
-    if hasattr(app.state, 'supabase_client'):
+    if hasattr(app.state, "supabase_client"):
         await app.state.supabase_client.disconnect()
-    
+
     # Cleanup WebSocket connections
-    if hasattr(app.state, 'websocket_manager'):
+    if hasattr(app.state, "websocket_manager"):
         await app.state.websocket_manager.cleanup()
-    
+
     logger.info("Nexus Forge API shutdown complete")
 
 
@@ -117,31 +136,22 @@ app = FastAPI(
     openapi_tags=[
         {
             "name": "forge",
-            "description": "Core app building operations with Starri orchestration"
+            "description": "Core app building operations with Starri orchestration",
         },
-        {
-            "name": "auth",
-            "description": "Authentication and user management"
-        },
-        {
-            "name": "adk",
-            "description": "Google Agent Development Kit integration"
-        },
-        {
-            "name": "health",
-            "description": "System health and monitoring"
-        }
-    ]
+        {"name": "auth", "description": "Authentication and user management"},
+        {"name": "adk", "description": "Google Agent Development Kit integration"},
+        {"name": "health", "description": "System health and monitoring"},
+    ],
 )
 
 # Security middleware
 app.add_middleware(
     TrustedHostMiddleware,
-    allowed_hosts=["*"] if os.getenv("ENVIRONMENT") == "development" else [
-        "nexusforge.example.com",
-        "api.nexusforge.example.com",
-        "*.run.app"
-    ]
+    allowed_hosts=(
+        ["*"]
+        if os.getenv("ENVIRONMENT") == "development"
+        else ["nexusforge.example.com", "api.nexusforge.example.com", "*.run.app"]
+    ),
 )
 
 # CORS middleware
@@ -150,7 +160,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:8000",
-        "https://nexusforge.example.com"
+        "https://nexusforge.example.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -169,7 +179,9 @@ app.include_router(health.router, prefix="/health", tags=["health"])
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(nexus_forge.router, prefix="/api/nexus-forge", tags=["forge"])
 app.include_router(adk.router, prefix="/api/adk", tags=["adk"])
-app.include_router(subscription.router, prefix="/api/subscription", tags=["subscription"])
+app.include_router(
+    subscription.router, prefix="/api/subscription", tags=["subscription"]
+)
 
 # Prometheus metrics endpoint
 metrics_app = make_asgi_app()
@@ -184,8 +196,8 @@ async def nexus_forge_exception_handler(request: Request, exc: NexusForgeError):
         content={
             "error": exc.error_code,
             "message": exc.message,
-            "details": exc.details
-        }
+            "details": exc.details,
+        },
     )
 
 
@@ -197,8 +209,8 @@ async def general_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={
             "error": "INTERNAL_SERVER_ERROR",
-            "message": "An unexpected error occurred"
-        }
+            "message": "An unexpected error occurred",
+        },
     )
 
 
@@ -218,8 +230,8 @@ async def root():
             "starri_orchestration",
             "real_time_coordination",
             "multi_agent_workflows",
-            "supabase_integration"
-        ]
+            "supabase_integration",
+        ],
     }
 
 
@@ -227,7 +239,7 @@ async def root():
 async def websocket_endpoint(websocket: WebSocket):
     """
     Main WebSocket endpoint for real-time agent coordination and task updates.
-    
+
     Provides:
     - Agent status updates
     - Task progress notifications
@@ -237,20 +249,20 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         # Accept the connection
         await websocket.accept()
-        
+
         # Get WebSocket manager
         ws_manager = app.state.websocket_manager
-        
+
         # For now, use a placeholder user ID - in production, extract from JWT
         user_id = "demo_user"  # TODO: Extract from authentication
-        
+
         # Connect to WebSocket manager
         session_id = await ws_manager.connect(websocket, user_id, "pro")
-        
+
         if not session_id:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
             return
-            
+
         try:
             # Listen for messages
             while True:
@@ -261,17 +273,20 @@ async def websocket_endpoint(websocket: WebSocket):
                     break
                 except Exception as e:
                     logger.error(f"WebSocket message error: {e}")
-                    await ws_manager.send_to_session(session_id, {
-                        "type": "error",
-                        "message": "Message processing failed",
-                        "timestamp": str(datetime.now())
-                    })
-                    
+                    await ws_manager.send_to_session(
+                        session_id,
+                        {
+                            "type": "error",
+                            "message": "Message processing failed",
+                            "timestamp": str(datetime.now()),
+                        },
+                    )
+
         except WebSocketDisconnect:
             logger.info(f"WebSocket disconnected for session {session_id}")
         finally:
             await ws_manager.disconnect(websocket, user_id, session_id)
-            
+
     except Exception as e:
         logger.error(f"WebSocket connection error: {e}")
         try:
@@ -297,38 +312,41 @@ async def register_agent(agent_data: dict):
     """Register a new agent with the orchestrator."""
     try:
         orchestrator = app.state.starri_orchestrator
-        
+
         # Extract agent information
         agent_id = agent_data.get("agent_id")
         agent_type = agent_data.get("agent_type", "generic")
         capabilities_list = agent_data.get("capabilities", [])
         configuration = agent_data.get("configuration", {})
-        
+
         # Convert capability strings to enum values
         from .agents.starri.orchestrator import AgentCapability
+
         capabilities = []
         for cap_str in capabilities_list:
             try:
                 capabilities.append(AgentCapability(cap_str))
             except ValueError:
                 logger.warning(f"Unknown capability: {cap_str}")
-        
+
         await orchestrator.register_agent(
             agent_id=agent_id,
             agent_type=agent_type,
             capabilities=capabilities,
-            configuration=configuration
+            configuration=configuration,
         )
-        
+
         return {
             "status": "success",
             "message": f"Agent {agent_id} registered successfully",
-            "agent_id": agent_id
+            "agent_id": agent_id,
         }
-        
+
     except Exception as e:
         logger.error(f"Error registering agent: {e}")
-        raise HTTPException(status_code=500, detail=f"Agent registration failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Agent registration failed: {str(e)}"
+        )
 
 
 @app.post("/api/orchestrator/tasks/decompose", tags=["orchestration"])
@@ -336,25 +354,27 @@ async def decompose_task(task_request: dict):
     """Decompose a complex task into subtasks using Starri's deep thinking."""
     try:
         orchestrator = app.state.starri_orchestrator
-        
+
         task_description = task_request.get("description", "")
         requirements = task_request.get("requirements", [])
         constraints = task_request.get("constraints", {})
-        
+
         if not task_description:
             raise HTTPException(status_code=400, detail="Task description is required")
-        
+
         result = await orchestrator.decompose_task(
             task_description=task_description,
             requirements=requirements,
-            constraints=constraints
+            constraints=constraints,
         )
-        
+
         return result
-        
+
     except Exception as e:
         logger.error(f"Error decomposing task: {e}")
-        raise HTTPException(status_code=500, detail=f"Task decomposition failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Task decomposition failed: {str(e)}"
+        )
 
 
 @app.post("/api/orchestrator/workflows/{workflow_id}/execute", tags=["orchestration"])
@@ -362,19 +382,22 @@ async def execute_workflow(workflow_id: str, execution_config: dict = None):
     """Execute a workflow using agent coordination."""
     try:
         orchestrator = app.state.starri_orchestrator
-        
-        execution_mode = execution_config.get("mode", "parallel") if execution_config else "parallel"
-        
-        result = await orchestrator.coordinate_agents(
-            workflow_id=workflow_id,
-            execution_mode=execution_mode
+
+        execution_mode = (
+            execution_config.get("mode", "parallel") if execution_config else "parallel"
         )
-        
+
+        result = await orchestrator.coordinate_agents(
+            workflow_id=workflow_id, execution_mode=execution_mode
+        )
+
         return result
-        
+
     except Exception as e:
         logger.error(f"Error executing workflow {workflow_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Workflow execution failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Workflow execution failed: {str(e)}"
+        )
 
 
 @app.get("/api/coordination/events", tags=["coordination"])
@@ -384,7 +407,7 @@ async def get_coordination_events(limit: int = 50):
         supabase_client = app.state.supabase_client
         events = await supabase_client.get_recent_events(limit=limit)
         return {"events": events}
-        
+
     except Exception as e:
         logger.error(f"Error getting coordination events: {e}")
         raise HTTPException(status_code=500, detail="Failed to get coordination events")
@@ -392,9 +415,10 @@ async def get_coordination_events(limit: int = 50):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "nexus_forge.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=os.getenv("ENVIRONMENT") == "development"
+        reload=os.getenv("ENVIRONMENT") == "development",
     )

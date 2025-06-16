@@ -2,4 +2,4 @@
 
 from .distributed_state import DistributedStateManager
 
-__all__ = ['DistributedStateManager']
+__all__ = ["DistributedStateManager"]

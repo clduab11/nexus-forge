@@ -5,62 +5,60 @@ This module provides the core ADK integration, replacing all fallback patterns
 with proper Google Cloud ADK implementation for multi-agent research.
 """
 
-import os
-import logging
-from typing import Dict, List, Optional, Any, AsyncGenerator
-from datetime import datetime
 import asyncio
+import logging
+import os
+from datetime import datetime
+from typing import Any, AsyncGenerator, Dict, List, Optional
+
+import vertexai
 
 # Google Cloud ADK imports
-from google.adk.agents import LlmAgent, BaseAgent
-from google.adk.tools import GoogleSearchTool, CodeExecTool
+from google.adk.agents import BaseAgent, LlmAgent
 from google.adk.streaming import StreamingSession
-from vertexai.preview.reasoning_engines import AdkApp
+from google.adk.tools import CodeExecTool, GoogleSearchTool
 from google.cloud import aiplatform
-import vertexai
+from vertexai.preview.reasoning_engines import AdkApp
 
 logger = logging.getLogger(__name__)
 
 
 class ParallaxPalADK:
     """Native ADK integration for Parallax Pal multi-agent system"""
-    
+
     def __init__(self):
         """Initialize ADK with Vertex AI configuration"""
-        
+
         # Initialize Vertex AI
-        self.project_id = os.getenv('GOOGLE_CLOUD_PROJECT')
-        self.location = os.getenv('GOOGLE_CLOUD_LOCATION', 'us-central1')
-        
+        self.project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+        self.location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+
         if not self.project_id:
             raise ValueError("GOOGLE_CLOUD_PROJECT environment variable must be set")
-        
-        vertexai.init(
-            project=self.project_id,
-            location=self.location
-        )
-        
+
+        vertexai.init(project=self.project_id, location=self.location)
+
         # ADK configuration
         self.model_config = {
-            'model': 'gemini-2.0-flash',
-            'temperature': 0.7,
-            'max_tokens': 8192,
-            'streaming': True
+            "model": "gemini-2.0-flash",
+            "temperature": 0.7,
+            "max_tokens": 8192,
+            "streaming": True,
         }
-        
+
         # Initialize agents
         self.agents = self._initialize_agents()
-        self.app = AdkApp(agent=self.agents['orchestrator'])
-        
+        self.app = AdkApp(agent=self.agents["orchestrator"])
+
         logger.info(f"ParallaxPal ADK initialized with project: {self.project_id}")
-    
+
     def _initialize_agents(self) -> Dict[str, LlmAgent]:
         """Initialize all specialized agents with proper ADK configuration"""
-        
+
         # Retrieval Agent with Google Search
         retrieval_agent = LlmAgent(
             name="retrieval_agent",
-            model=self.model_config['model'],
+            model=self.model_config["model"],
             description="Expert in web search and information retrieval",
             instruction="""You are a research specialist with expertise in finding credible sources.
             
@@ -79,17 +77,24 @@ class ParallaxPalADK:
             tools=[
                 GoogleSearchTool(
                     num_results=10,
-                    include_domains=["edu", "gov", "org", "arxiv.org", "nature.com", "science.org"],
-                    safe_search=True
+                    include_domains=[
+                        "edu",
+                        "gov",
+                        "org",
+                        "arxiv.org",
+                        "nature.com",
+                        "science.org",
+                    ],
+                    safe_search=True,
                 )
             ],
-            temperature=0.3  # Lower temperature for factual searches
+            temperature=0.3,  # Lower temperature for factual searches
         )
-        
+
         # Analysis Agent with Code Execution
         analysis_agent = LlmAgent(
             name="analysis_agent",
-            model=self.model_config['model'],
+            model=self.model_config["model"],
             description="Expert in data analysis and synthesis",
             instruction="""You are an expert analyst who synthesizes information from multiple sources.
             
@@ -109,16 +114,22 @@ class ParallaxPalADK:
             tools=[
                 CodeExecTool(
                     timeout=30,
-                    allowed_imports=["pandas", "numpy", "matplotlib", "seaborn", "scipy"]
+                    allowed_imports=[
+                        "pandas",
+                        "numpy",
+                        "matplotlib",
+                        "seaborn",
+                        "scipy",
+                    ],
                 )
             ],
-            temperature=0.5
+            temperature=0.5,
         )
-        
+
         # Citation Agent
         citation_agent = LlmAgent(
             name="citation_agent",
-            model=self.model_config['model'],
+            model=self.model_config["model"],
             description="Expert in academic citation generation",
             instruction="""You are a citation specialist who ensures proper academic attribution.
             
@@ -140,13 +151,13 @@ class ParallaxPalADK:
             6. Add annotations summarizing each source's contribution
             
             Maintain absolute accuracy - even minor formatting errors are unacceptable.""",
-            temperature=0.1  # Very low for accuracy
+            temperature=0.1,  # Very low for accuracy
         )
-        
+
         # Knowledge Graph Agent
         knowledge_graph_agent = LlmAgent(
             name="knowledge_graph_agent",
-            model=self.model_config['model'],
+            model=self.model_config["model"],
             description="Expert in entity extraction and relationship mapping",
             instruction="""You are a knowledge graph specialist who visualizes information relationships.
             
@@ -173,13 +184,13 @@ class ParallaxPalADK:
                }
             
             Focus on the most significant relationships to avoid clutter.""",
-            temperature=0.4
+            temperature=0.4,
         )
-        
+
         # Master Orchestrator
         orchestrator = LlmAgent(
             name="orchestrator",
-            model=self.model_config['model'],
+            model=self.model_config["model"],
             description="Master research coordinator - Starri",
             instruction="""You are Starri, an enthusiastic AI research assistant who coordinates a team of specialists.
             
@@ -208,156 +219,154 @@ class ParallaxPalADK:
             Maintain conversation context across the entire session.
             If the user asks follow-up questions, build upon previous research.
             Always aim for comprehensive, accurate, and well-cited responses.""",
-            sub_agents=[retrieval_agent, analysis_agent, citation_agent, knowledge_graph_agent],
-            temperature=0.7
+            sub_agents=[
+                retrieval_agent,
+                analysis_agent,
+                citation_agent,
+                knowledge_graph_agent,
+            ],
+            temperature=0.7,
         )
-        
+
         return {
-            'orchestrator': orchestrator,
-            'retrieval': retrieval_agent,
-            'analysis': analysis_agent,
-            'citation': citation_agent,
-            'knowledge_graph': knowledge_graph_agent
+            "orchestrator": orchestrator,
+            "retrieval": retrieval_agent,
+            "analysis": analysis_agent,
+            "citation": citation_agent,
+            "knowledge_graph": knowledge_graph_agent,
         }
-    
+
     async def stream_research(
-        self, 
-        query: str, 
-        user_id: str, 
-        session_id: str,
-        mode: str = "comprehensive"
+        self, query: str, user_id: str, session_id: str, mode: str = "comprehensive"
     ) -> AsyncGenerator[Dict[str, Any], None]:
         """
         Stream research results with real-time updates
-        
+
         Args:
             query: The research query
             user_id: ID of the user making the request
             session_id: Unique session identifier
             mode: Research mode (quick, comprehensive, continuous)
-            
+
         Yields:
             Dict containing event type, agent, content, progress, and metadata
         """
-        
+
         try:
             # Create streaming session
             session = StreamingSession(
                 app=self.app,
                 user_id=user_id,
                 session_id=session_id,
-                config={
-                    'streaming': True,
-                    'return_intermediate_steps': True
-                }
+                config={"streaming": True, "return_intermediate_steps": True},
             )
-            
+
             # Prepare query with mode context
             contextualized_query = self._prepare_query(query, mode)
-            
+
             # Track progress
             start_time = datetime.now()
             last_progress = 0
-            
+
             # Stream results
             async for event in session.stream_query(contextualized_query):
                 # Calculate progress
                 progress = self._calculate_progress(event)
-                
+
                 # Yield formatted event
                 yield {
-                    'type': event.type,
-                    'agent': event.agent_name,
-                    'content': event.content,
-                    'progress': progress,
-                    'metadata': {
-                        'timestamp': datetime.now().isoformat(),
-                        'elapsed_seconds': (datetime.now() - start_time).total_seconds(),
-                        'session_id': session_id,
-                        **event.metadata
-                    }
+                    "type": event.type,
+                    "agent": event.agent_name,
+                    "content": event.content,
+                    "progress": progress,
+                    "metadata": {
+                        "timestamp": datetime.now().isoformat(),
+                        "elapsed_seconds": (
+                            datetime.now() - start_time
+                        ).total_seconds(),
+                        "session_id": session_id,
+                        **event.metadata,
+                    },
                 }
-                
+
                 # Update progress tracking
                 if progress > last_progress:
                     last_progress = progress
-                    logger.info(f"Research progress: {progress}% for session {session_id}")
-                
+                    logger.info(
+                        f"Research progress: {progress}% for session {session_id}"
+                    )
+
         except Exception as e:
             logger.error(f"Error in stream_research: {str(e)}")
             yield {
-                'type': 'error',
-                'agent': 'orchestrator',
-                'content': f"I encountered an error while researching. Please try again.",
-                'progress': 100,
-                'metadata': {
-                    'error_type': type(e).__name__,
-                    'session_id': session_id
-                }
+                "type": "error",
+                "agent": "orchestrator",
+                "content": f"I encountered an error while researching. Please try again.",
+                "progress": 100,
+                "metadata": {"error_type": type(e).__name__, "session_id": session_id},
             }
-    
+
     def _prepare_query(self, query: str, mode: str) -> str:
         """Prepare query with mode-specific instructions"""
-        
+
         mode_instructions = {
-            'quick': "Provide a quick overview with 3-5 key sources.",
-            'comprehensive': "Conduct thorough research with 10-15 sources and detailed analysis.",
-            'continuous': "Explore all aspects exhaustively, including edge cases and alternative viewpoints."
+            "quick": "Provide a quick overview with 3-5 key sources.",
+            "comprehensive": "Conduct thorough research with 10-15 sources and detailed analysis.",
+            "continuous": "Explore all aspects exhaustively, including edge cases and alternative viewpoints.",
         }
-        
-        instruction = mode_instructions.get(mode, mode_instructions['comprehensive'])
+
+        instruction = mode_instructions.get(mode, mode_instructions["comprehensive"])
         return f"{query}\n\nResearch mode: {mode}. {instruction}"
-    
+
     def _calculate_progress(self, event: Any) -> int:
         """Calculate progress percentage based on event type and agent"""
-        
+
         progress_map = {
-            ('start', 'orchestrator'): 5,
-            ('delegating', 'orchestrator'): 10,
-            ('searching', 'retrieval_agent'): 30,
-            ('analyzing', 'analysis_agent'): 50,
-            ('citing', 'citation_agent'): 70,
-            ('graphing', 'knowledge_graph_agent'): 85,
-            ('synthesizing', 'orchestrator'): 95,
-            ('complete', 'orchestrator'): 100
+            ("start", "orchestrator"): 5,
+            ("delegating", "orchestrator"): 10,
+            ("searching", "retrieval_agent"): 30,
+            ("analyzing", "analysis_agent"): 50,
+            ("citing", "citation_agent"): 70,
+            ("graphing", "knowledge_graph_agent"): 85,
+            ("synthesizing", "orchestrator"): 95,
+            ("complete", "orchestrator"): 100,
         }
-        
+
         key = (event.type, event.agent_name)
         return progress_map.get(key, 50)  # Default to 50% for unknown events
-    
+
     async def get_agent_health(self) -> Dict[str, Any]:
         """Check health status of all agents"""
-        
+
         health_status = {}
-        
+
         for agent_name, agent in self.agents.items():
             try:
                 # Send health check query
                 start_time = datetime.now()
                 response = await agent.aquery(
-                    "Health check - respond with 'OK'",
-                    timeout=5
+                    "Health check - respond with 'OK'", timeout=5
                 )
                 response_time = (datetime.now() - start_time).total_seconds()
-                
+
                 health_status[agent_name] = {
-                    'status': 'healthy',
-                    'response_time_seconds': response_time,
-                    'last_check': datetime.now().isoformat()
+                    "status": "healthy",
+                    "response_time_seconds": response_time,
+                    "last_check": datetime.now().isoformat(),
                 }
-                
+
             except Exception as e:
                 health_status[agent_name] = {
-                    'status': 'unhealthy',
-                    'error': str(e),
-                    'last_check': datetime.now().isoformat()
+                    "status": "unhealthy",
+                    "error": str(e),
+                    "last_check": datetime.now().isoformat(),
                 }
-        
+
         # Overall health
-        all_healthy = all(s['status'] == 'healthy' for s in health_status.values())
-        
+        all_healthy = all(s["status"] == "healthy" for s in health_status.values())
+
         return {
-            'overall_status': 'healthy' if all_healthy else 'degraded',
-            'agents': health_status,
-            'timestamp': datetime.now().isoformat()
+            "overall_status": "healthy" if all_healthy else "degraded",
+            "agents": health_status,
+            "timestamp": datetime.now().isoformat(),
         }

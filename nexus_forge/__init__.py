@@ -9,8 +9,8 @@ __version__ = "1.0.0"
 __author__ = "Nexus Forge Team"
 __description__ = "AI-Powered One-Shot App Builder with Multi-Agent Orchestration"
 
-from .core.exceptions import NexusForgeError
 from .agents import StarriOrchestrator
+from .core.exceptions import NexusForgeError
 
 __all__ = [
     "NexusForgeError",

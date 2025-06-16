@@ -5,17 +5,17 @@ This module provides high-level access to Jules' autonomous coding capabilities.
 """
 
 from .coding_agent import (
+    CodingTaskResult,
     JulesAgent,
     JulesAgentConfig,
-    CodingTaskResult,
     quick_feature,
-    quick_fix
+    quick_fix,
 )
 
 __all__ = [
     "JulesAgent",
-    "JulesAgentConfig", 
+    "JulesAgentConfig",
     "CodingTaskResult",
     "quick_feature",
-    "quick_fix"
+    "quick_fix",
 ]

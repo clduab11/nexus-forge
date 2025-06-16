@@ -1,12 +1,15 @@
-from typing import Dict, Any, Union
+from typing import Any, Dict, Union
+
 try:
+    from pydantic import EmailStr, HttpUrl, PostgresDsn, validator
     from pydantic_settings import BaseSettings
-    from pydantic import PostgresDsn, HttpUrl, EmailStr, validator
 except ImportError:
     # Fallback for older pydantic versions
     from pydantic import BaseSettings, PostgresDsn, HttpUrl, EmailStr, validator
+
 import os
 from functools import lru_cache
+
 
 class Settings(BaseSettings):
     # Application
@@ -18,38 +21,38 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
-    
+
     # Database
     DATABASE_URL: Union[PostgresDsn, str]
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
-    
+
     # Redis Cache
     REDIS_URL: str
     REDIS_PASSWORD: str = None
     REDIS_DB: int = 0
-    
+
     # Frontend
     FRONTEND_URL: HttpUrl
     CORS_ORIGINS: list[str] = ["*"]
-    
+
     # OAuth Providers
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str
     GOOGLE_REDIRECT_URI: HttpUrl
-    
+
     GITHUB_CLIENT_ID: str
     GITHUB_CLIENT_SECRET: str
     GITHUB_REDIRECT_URI: HttpUrl
-    
+
     FACEBOOK_CLIENT_ID: str
     FACEBOOK_CLIENT_SECRET: str
     FACEBOOK_REDIRECT_URI: HttpUrl
-    
+
     INSTAGRAM_CLIENT_ID: str
     INSTAGRAM_CLIENT_SECRET: str
     INSTAGRAM_REDIRECT_URI: HttpUrl
-    
+
     # Email
     SMTP_HOST: str
     SMTP_PORT: int
@@ -57,22 +60,22 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str
     SMTP_FROM_EMAIL: EmailStr
     SMTP_FROM_NAME: str = "Parallax Pal"
-    
+
     # Stripe
     STRIPE_SECRET_KEY: str
     STRIPE_PUBLISHABLE_KEY: str
     STRIPE_WEBHOOK_SECRET: str
-    
+
     # GPU Settings
     GPU_MEMORY_THRESHOLD: float = 0.9  # 90% memory usage threshold
     DEFAULT_MODEL: str = "llama2"
     OLLAMA_API_URL: str = "http://localhost:11434"
-    
+
     # Google Cloud AI Settings
     GOOGLE_CLOUD_PROJECT_ID: str = None
     GOOGLE_CLOUD_REGION: str = "us-central1"
     VERTEX_AI_LOCATION: str = "us-central1"
-    
+
     # Jules Integration Settings
     JULES_GITHUB_TOKEN: str = None
     JULES_WEBHOOK_SECRET: str = None
@@ -80,36 +83,36 @@ class Settings(BaseSettings):
     JULES_DEFAULT_ORG: str = "nexus-forge"
     JULES_MAX_RETRIES: int = 3
     JULES_TIMEOUT_MINUTES: int = 30
-    
+
     # Gemini Settings
     GEMINI_PRO_MODEL: str = "gemini-2.5-pro"
     GEMINI_FLASH_MODEL: str = "gemini-2.5-flash"
     GEMINI_MAX_TOKENS: int = 8192
     GEMINI_TEMPERATURE: float = 0.7
-    
+
     # Imagen Settings
     IMAGEN_MODEL_VERSION: str = "imagen-4.0"
     IMAGEN_DEFAULT_RESOLUTION: str = "2048x1536"
     IMAGEN_SAFETY_FILTER: str = "block_some"
-    
+
     # Veo Settings
     VEO_MODEL_VERSION: str = "veo-3.0-generate-preview"
     VEO_DEFAULT_DURATION: int = 30
     VEO_OUTPUT_BUCKET: str = None
-    
+
     # Monitoring
     SENTRY_DSN: str = None
     LOG_LEVEL: str = "INFO"
     ENABLE_METRICS: bool = True
     METRICS_PORT: int = 9090
-    
+
     # Security
     ALLOWED_HOSTS: list[str] = ["*"]
     SSL_KEYFILE: str = None
     SSL_CERTFILE: str = None
     SECURE_HEADERS: bool = True
     RATE_LIMIT_PER_MINUTE: int = 60
-    
+
     class Config:
         env_file = ".env"
         case_sensitive = True
@@ -129,7 +132,7 @@ class Settings(BaseSettings):
             password=v.get("password"),
             host=v.get("host"),
             port=v.get("port"),
-            path=f"/{v.get('database')}"
+            path=f"/{v.get('database')}",
         )
 
     @validator("REDIS_URL", pre=True)
@@ -153,15 +156,18 @@ class Settings(BaseSettings):
             return [host.strip() for host in v.split(",")]
         return v
 
+
 @lru_cache()
 def get_settings() -> Settings:
     """Get cached settings instance"""
     return Settings()
 
+
 def get_db_url() -> str:
     """Get database URL with proper formatting"""
     settings = get_settings()
     return str(settings.DATABASE_URL)
+
 
 def get_security_settings() -> Dict[str, Any]:
     """Get security-related settings"""
@@ -172,6 +178,7 @@ def get_security_settings() -> Dict[str, Any]:
         "refresh_token_expire_days": settings.REFRESH_TOKEN_EXPIRE_DAYS,
         "rate_limit_per_minute": settings.RATE_LIMIT_PER_MINUTE,
     }
+
 
 # Environment-specific settings
 ENVIRONMENT_SETTINGS: Dict[str, Dict[str, Any]] = {
@@ -221,7 +228,7 @@ ENVIRONMENT_SETTINGS: Dict[str, Dict[str, Any]] = {
         "STRIPE_SECRET_KEY": "sk_test_123456789",
         "STRIPE_PUBLISHABLE_KEY": "pk_test_123456789",
         "STRIPE_WEBHOOK_SECRET": "whsec_test_123456789",
-    }
+    },
 }
 
 # Load environment-specific settings
@@ -240,24 +247,24 @@ GOOGLE_AI_SETTINGS = {
         "auto_approve_prs": settings.JULES_AUTO_APPROVE_PRS,
         "default_org": settings.JULES_DEFAULT_ORG,
         "max_retries": settings.JULES_MAX_RETRIES,
-        "timeout_minutes": settings.JULES_TIMEOUT_MINUTES
+        "timeout_minutes": settings.JULES_TIMEOUT_MINUTES,
     },
     "gemini": {
         "pro_model": settings.GEMINI_PRO_MODEL,
         "flash_model": settings.GEMINI_FLASH_MODEL,
         "max_tokens": settings.GEMINI_MAX_TOKENS,
-        "temperature": settings.GEMINI_TEMPERATURE
+        "temperature": settings.GEMINI_TEMPERATURE,
     },
     "imagen": {
         "model_version": settings.IMAGEN_MODEL_VERSION,
         "default_resolution": settings.IMAGEN_DEFAULT_RESOLUTION,
-        "safety_filter": settings.IMAGEN_SAFETY_FILTER
+        "safety_filter": settings.IMAGEN_SAFETY_FILTER,
     },
     "veo": {
         "model_version": settings.VEO_MODEL_VERSION,
         "default_duration": settings.VEO_DEFAULT_DURATION,
-        "output_bucket": settings.VEO_OUTPUT_BUCKET
-    }
+        "output_bucket": settings.VEO_OUTPUT_BUCKET,
+    },
 }
 
 # OAuth configurations
@@ -285,7 +292,7 @@ OAUTH_SETTINGS = {
         "client_secret": settings.INSTAGRAM_CLIENT_SECRET,
         "redirect_uri": str(settings.INSTAGRAM_REDIRECT_URI),
         "scope": ["basic"],
-    }
+    },
 }
 
 # Example .env file template
@@ -366,10 +373,12 @@ VEO_OUTPUT_BUCKET=gs://your-veo-outputs
 SENTRY_DSN=your-sentry-dsn
 """
 
+
 def generate_env_file():
     """Generate .env file template"""
     with open(".env.example", "w") as f:
         f.write(ENV_TEMPLATE.strip())
+
 
 if __name__ == "__main__":
     # Generate .env.example file when run directly

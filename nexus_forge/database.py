@@ -1,14 +1,15 @@
+import logging
+import os
+from contextlib import contextmanager
+from typing import AsyncGenerator, Generator
+
 from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool, StaticPool
-from contextlib import contextmanager
-import logging
-import os
-from typing import Generator, AsyncGenerator
 
-from .config import settings, get_db_url
+from .config import get_db_url, settings
 
 logger = logging.getLogger(__name__)
 
@@ -23,14 +24,14 @@ if is_sqlite:
         db_url,
         poolclass=StaticPool,
         connect_args={"check_same_thread": False},
-        echo=settings.DEBUG
+        echo=settings.DEBUG,
     )
-    
+
     async_engine = create_async_engine(
         db_url,
         poolclass=StaticPool,
         connect_args={"check_same_thread": False},
-        echo=settings.DEBUG
+        echo=settings.DEBUG,
     )
 else:
     # PostgreSQL configuration (production)
@@ -41,34 +42,28 @@ else:
         max_overflow=settings.DATABASE_MAX_OVERFLOW,
         pool_pre_ping=True,
         pool_recycle=3600,
-        echo=settings.DEBUG
+        echo=settings.DEBUG,
     )
-    
+
     async_engine = create_async_engine(
-        db_url.replace('postgresql://', 'postgresql+asyncpg://'),
+        db_url.replace("postgresql://", "postgresql+asyncpg://"),
         pool_size=settings.DATABASE_POOL_SIZE,
         max_overflow=settings.DATABASE_MAX_OVERFLOW,
         pool_pre_ping=True,
         pool_recycle=3600,
-        echo=settings.DEBUG
+        echo=settings.DEBUG,
     )
 
 # Create session factories
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 AsyncSessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=async_engine,
-    class_=AsyncSession
+    autocommit=False, autoflush=False, bind=async_engine, class_=AsyncSession
 )
 
 # Base class for SQLAlchemy models
 Base = declarative_base()
+
 
 @contextmanager
 def get_db() -> Generator:
@@ -88,6 +83,7 @@ def get_db() -> Generator:
     finally:
         db.close()
 
+
 async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Asynchronous database session context manager.
@@ -105,6 +101,7 @@ async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
         finally:
             await session.close()
 
+
 def init_db() -> None:
     """Initialize database tables"""
     try:
@@ -113,6 +110,7 @@ def init_db() -> None:
     except Exception as e:
         logger.error(f"Failed to initialize database: {str(e)}")
         raise
+
 
 async def check_db_connection() -> bool:
     """Check database connectivity"""
@@ -123,6 +121,7 @@ async def check_db_connection() -> bool:
     except Exception as e:
         logger.error(f"Database connection check failed: {str(e)}")
         return False
+
 
 class DatabaseHealthCheck:
     @staticmethod
@@ -135,7 +134,7 @@ class DatabaseHealthCheck:
             async with get_async_db() as db:
                 # Check basic connectivity
                 await db.execute("SELECT 1")
-                
+
                 # Get connection pool stats
                 pool_status = {
                     "pool_size": engine.pool.size(),
@@ -143,16 +142,16 @@ class DatabaseHealthCheck:
                     "checkedout": engine.pool.checkedout(),
                     "overflow": engine.pool.overflow(),
                 }
-                
+
                 return {
                     "status": "healthy",
                     "pool_metrics": pool_status,
-                    "message": "Database connection successful"
+                    "message": "Database connection successful",
                 }
         except Exception as e:
             logger.error(f"Database health check failed: {str(e)}")
             return {
                 "status": "unhealthy",
                 "error": str(e),
-                "message": "Database connection failed"
+                "message": "Database connection failed",
             }

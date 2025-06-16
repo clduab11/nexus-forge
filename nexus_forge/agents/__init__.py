@@ -10,6 +10,4 @@ Multi-agent system coordinating various AI models for app building:
 
 from .agents.nexus_forge_agents import StarriOrchestrator
 
-__all__ = [
-    "StarriOrchestrator"
-]
+__all__ = ["StarriOrchestrator"]

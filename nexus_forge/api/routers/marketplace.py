@@ -2,20 +2,23 @@
 Marketplace API endpoints for agent discovery and distribution
 """
 
-from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, Form
-from fastapi.responses import FileResponse
-import tempfile
 import os
+import tempfile
+from typing import Any, Dict, List, Optional
 
-from ...marketplace import (
-    AgentRegistry, MarketplaceSearchEngine,
-    AgentManifest, AgentPackage, AgentStatus
-)
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
+from fastapi.responses import FileResponse
+
 from ...core.auth import get_current_user
-from ...core.exceptions import ValidationError, NotFoundError
+from ...core.exceptions import NotFoundError, ValidationError
+from ...marketplace import (
+    AgentManifest,
+    AgentPackage,
+    AgentRegistry,
+    AgentStatus,
+    MarketplaceSearchEngine,
+)
 from ..schemas.auth import User
-
 
 router = APIRouter(prefix="/api/v1/marketplace", tags=["marketplace"])
 
@@ -28,39 +31,42 @@ search_engine = MarketplaceSearchEngine()
 async def publish_agent(
     manifest: str = Form(..., description="Agent manifest JSON"),
     package: UploadFile = File(..., description="Agent package ZIP file"),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     """
     Publish a new agent to the marketplace
-    
+
     Requires authentication. The agent will undergo security scanning
     and performance benchmarking before approval.
     """
     try:
         # Parse manifest
         import json
+
         manifest_data = json.loads(manifest)
         agent_manifest = AgentManifest(**manifest_data)
-        
+
         # Read package file
         package_content = await package.read()
-        
+
         # Publish agent
         agent_package = await registry.publish_agent(
             package_file=package_content,
             manifest=agent_manifest,
             author_id=current_user.id,
-            author_email=current_user.email
+            author_email=current_user.email,
         )
-        
+
         return agent_package
-        
+
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid manifest JSON")
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to publish agent: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to publish agent: {str(e)}"
+        )
 
 
 @router.get("/agents/search", response_model=List[Dict[str, Any]])
@@ -73,11 +79,11 @@ async def search_agents(
     min_downloads: Optional[int] = Query(None, ge=0, description="Minimum downloads"),
     sort_by: str = Query("relevance", regex="^(relevance|downloads|rating|newest)$"),
     limit: int = Query(20, ge=1, le=100),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
 ):
     """
     Search for agents in the marketplace
-    
+
     Supports semantic search, filtering, and various sort options.
     """
     filters = {}
@@ -91,22 +97,18 @@ async def search_agents(
         filters["min_rating"] = min_rating
     if min_downloads is not None:
         filters["min_downloads"] = min_downloads
-    
+
     results = await search_engine.search(
-        query=q,
-        filters=filters,
-        limit=limit,
-        offset=offset,
-        sort_by=sort_by
+        query=q, filters=filters, limit=limit, offset=offset, sort_by=sort_by
     )
-    
+
     return [result.dict() for result in results]
 
 
 @router.get("/agents/trending", response_model=List[AgentPackage])
 async def get_trending_agents(
     time_window: str = Query("week", regex="^(day|week|month)$"),
-    limit: int = Query(10, ge=1, le=50)
+    limit: int = Query(10, ge=1, le=50),
 ):
     """Get trending agents based on recent activity"""
     agents = await search_engine.get_trending(time_window, limit)
@@ -116,7 +118,7 @@ async def get_trending_agents(
 @router.get("/agents/suggest")
 async def get_suggestions(
     q: str = Query(..., min_length=2, description="Partial search query"),
-    limit: int = Query(10, ge=1, le=20)
+    limit: int = Query(10, ge=1, le=20),
 ):
     """Get search suggestions for autocomplete"""
     suggestions = await search_engine.suggest(q, limit)
@@ -126,7 +128,9 @@ async def get_suggestions(
 @router.get("/agents/{name}", response_model=AgentPackage)
 async def get_agent(
     name: str,
-    version: Optional[str] = Query(None, description="Specific version (default: latest)")
+    version: Optional[str] = Query(
+        None, description="Specific version (default: latest)"
+    ),
 ):
     """Get agent details by name and optional version"""
     try:
@@ -137,23 +141,17 @@ async def get_agent(
 
 
 @router.get("/agents/{agent_id}/similar", response_model=List[AgentPackage])
-async def get_similar_agents(
-    agent_id: str,
-    limit: int = Query(10, ge=1, le=20)
-):
+async def get_similar_agents(agent_id: str, limit: int = Query(10, ge=1, le=20)):
     """Find agents similar to the specified agent"""
     agents = await search_engine.get_similar(agent_id, limit)
     return agents
 
 
 @router.post("/agents/{agent_id}/install")
-async def install_agent(
-    agent_id: str,
-    current_user: User = Depends(get_current_user)
-):
+async def install_agent(agent_id: str, current_user: User = Depends(get_current_user)):
     """
     Install an agent for the current user
-    
+
     Returns installation instructions and dependencies.
     """
     try:
@@ -166,28 +164,25 @@ async def install_agent(
 
 
 @router.get("/agents/{agent_id}/download")
-async def download_agent(
-    agent_id: str,
-    current_user: User = Depends(get_current_user)
-):
+async def download_agent(agent_id: str, current_user: User = Depends(get_current_user)):
     """Download agent package file"""
     try:
         # Get agent
         agent = await registry._get_agent_by_id(agent_id)
-        
+
         if not agent.package_url:
             raise HTTPException(status_code=404, detail="Package file not found")
-        
+
         # Record download
         await registry._increment_downloads(agent_id)
-        
+
         # Return file
         return FileResponse(
             agent.package_url,
             media_type="application/zip",
-            filename=f"{agent.manifest.name}-{agent.manifest.version}.zip"
+            filename=f"{agent.manifest.name}-{agent.manifest.version}.zip",
         )
-        
+
     except NotFoundError:
         raise HTTPException(status_code=404, detail="Agent not found")
 
@@ -197,15 +192,12 @@ async def rate_agent(
     agent_id: str,
     rating: int = Form(..., ge=1, le=5),
     review: Optional[str] = Form(None, max_length=1000),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     """Rate and review an agent"""
     try:
         await registry.rate_agent(
-            agent_id=agent_id,
-            user_id=current_user.id,
-            rating=rating,
-            review=review
+            agent_id=agent_id, user_id=current_user.id, rating=rating, review=review
         )
         return {"status": "success", "message": "Rating submitted"}
     except ValidationError as e:
@@ -218,16 +210,16 @@ async def rate_agent(
 async def get_categories():
     """Get list of available agent categories"""
     from ...marketplace.models import AgentCategory
-    
+
     categories = [
         {
             "value": cat.value,
             "name": cat.value.replace("_", " ").title(),
-            "description": f"Agents for {cat.value.replace('_', ' ')}"
+            "description": f"Agents for {cat.value.replace('_', ' ')}",
         }
         for cat in AgentCategory
     ]
-    
+
     return categories
 
 
@@ -245,42 +237,40 @@ async def get_marketplace_stats():
             "code_generation": 8,
             "data_processing": 10,
             "workflow_automation": 7,
-            "analytics": 5
+            "analytics": 5,
         },
         "popular_tags": [
             {"tag": "ai", "count": 35},
             {"tag": "automation", "count": 28},
             {"tag": "nlp", "count": 22},
             {"tag": "productivity", "count": 18},
-            {"tag": "integration", "count": 15}
-        ]
+            {"tag": "integration", "count": 15},
+        ],
     }
 
 
 # Admin endpoints
+
 
 @router.put("/admin/agents/{agent_id}/status")
 async def update_agent_status(
     agent_id: str,
     status: AgentStatus,
     notes: Optional[str] = Form(None),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     """
     Update agent status (admin only)
-    
+
     Used for approving/rejecting agents after review.
     """
     # Check admin permissions
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
     try:
         agent = await registry.update_agent_status(
-            agent_id=agent_id,
-            status=status,
-            reviewer_id=current_user.id,
-            notes=notes
+            agent_id=agent_id, status=status, reviewer_id=current_user.id, notes=notes
         )
         return agent
     except NotFoundError:
@@ -291,22 +281,18 @@ async def update_agent_status(
 async def get_review_queue(
     current_user: User = Depends(get_current_user),
     limit: int = Query(20, ge=1, le=100),
-    offset: int = Query(0, ge=0)
+    offset: int = Query(0, ge=0),
 ):
     """Get agents pending review (admin only)"""
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
     # Query pending agents
     agents = await registry.search_agents(
-        category=None,
-        tags=None,
-        author=None,
-        limit=limit,
-        offset=offset
+        category=None, tags=None, author=None, limit=limit, offset=offset
     )
-    
+
     # Filter for pending status
     pending = [a for a in agents if a.status == AgentStatus.PENDING]
-    
+
     return pending

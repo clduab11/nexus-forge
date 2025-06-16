@@ -58,3 +58,18 @@ htmlcov/
 # MCP Configuration (contains API keys)
 .roo/
 mcp.json
+
+# Frontend (Node.js/React)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/.next/
+frontend/.env*
+frontend/*.tsbuildinfo
+frontend/coverage/
+frontend/.turbo/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*

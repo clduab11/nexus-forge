@@ -1,27 +1,29 @@
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, status
-import jwt
-from jwt.exceptions import PyJWTError
+from typing import Any, Dict, Optional
 
-from ..models import User, RefreshToken
-from ..api.schemas.auth import UserCreate, Token
-from ..api.schemas.oauth import OAuthProvider, OAuthUserData
-from ..api.dependencies.oauth import (
-    google_oauth,
-    github_oauth,
-    facebook_oauth,
-    instagram_oauth
-)
-from ..config import settings
+import jwt
+from fastapi import HTTPException, status
+from jwt.exceptions import PyJWTError
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+
 from ..api.dependencies.auth import (
+    create_access_token,
+    create_refresh_token,
     get_password_hash,
     verify_password,
-    create_access_token,
-    create_refresh_token
 )
+from ..api.dependencies.oauth import (
+    facebook_oauth,
+    github_oauth,
+    google_oauth,
+    instagram_oauth,
+)
+from ..api.schemas.auth import Token, UserCreate
+from ..api.schemas.oauth import OAuthProvider, OAuthUserData
+from ..config import settings
+from ..models import RefreshToken, User
+
 
 class AuthService:
     async def create_user(self, db: Session, user_data: UserCreate) -> User:
@@ -29,16 +31,16 @@ class AuthService:
         # Check if user already exists
         if db.query(User).filter(User.email == user_data.email).first():
             raise ValueError("Email already registered")
-        
+
         # Create user
         hashed_password = get_password_hash(user_data.password)
         user = User(
             email=user_data.email,
             username=user_data.username,
             hashed_password=hashed_password,
-            is_active=False  # Requires email verification
+            is_active=False,  # Requires email verification
         )
-        
+
         try:
             db.add(user)
             db.commit()
@@ -52,9 +54,7 @@ class AuthService:
         """Verify user's email address"""
         try:
             payload = jwt.decode(
-                token,
-                settings.SECRET_KEY,
-                algorithms=[settings.JWT_ALGORITHM]
+                token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
             )
             email = payload.get("sub")
             if not email:
@@ -80,24 +80,21 @@ class AuthService:
         db_refresh_token = RefreshToken(
             token=refresh_token,
             user_id=user.id,
-            expires_at=datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+            expires_at=datetime.utcnow()
+            + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
         )
         db.add(db_refresh_token)
         db.commit()
 
         return Token(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            token_type="bearer"
+            access_token=access_token, refresh_token=refresh_token, token_type="bearer"
         )
 
     async def refresh_token(self, db: Session, refresh_token: str) -> Token:
         """Get new access token using refresh token"""
         try:
             payload = jwt.decode(
-                refresh_token,
-                settings.SECRET_KEY,
-                algorithms=[settings.JWT_ALGORITHM]
+                refresh_token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
             )
             email = payload.get("sub")
             if not email:
@@ -106,10 +103,14 @@ class AuthService:
             raise ValueError("Invalid refresh token")
 
         # Verify refresh token exists and is valid
-        db_token = db.query(RefreshToken).filter(
-            RefreshToken.token == refresh_token,
-            RefreshToken.expires_at > datetime.utcnow()
-        ).first()
+        db_token = (
+            db.query(RefreshToken)
+            .filter(
+                RefreshToken.token == refresh_token,
+                RefreshToken.expires_at > datetime.utcnow(),
+            )
+            .first()
+        )
         if not db_token:
             raise ValueError("Invalid or expired refresh token")
 
@@ -121,17 +122,14 @@ class AuthService:
         return await self.create_tokens(db, user)
 
     async def handle_oauth_login(
-        self,
-        db: Session,
-        provider: OAuthProvider,
-        code: str
+        self, db: Session, provider: OAuthProvider, code: str
     ) -> Token:
         """Handle OAuth login flow"""
         oauth_handlers = {
             OAuthProvider.GOOGLE: google_oauth,
             OAuthProvider.GITHUB: github_oauth,
             OAuthProvider.FACEBOOK: facebook_oauth,
-            OAuthProvider.INSTAGRAM: instagram_oauth
+            OAuthProvider.INSTAGRAM: instagram_oauth,
         }
 
         if provider not in oauth_handlers:
@@ -146,10 +144,10 @@ class AuthService:
         if not user:
             user = User(
                 email=user_data.email,
-                username=user_data.username or user_data.email.split('@')[0],
+                username=user_data.username or user_data.email.split("@")[0],
                 is_active=True,  # OAuth users are pre-verified
                 oauth_provider=provider,
-                oauth_user_id=user_data.provider_user_id
+                oauth_user_id=user_data.provider_user_id,
             )
             db.add(user)
             db.commit()
@@ -167,26 +165,19 @@ class AuthService:
 
         # Create reset token
         reset_token = create_access_token(
-            data={"sub": user.email, "type": "reset"},
-            expires_delta=timedelta(hours=1)
+            data={"sub": user.email, "type": "reset"}, expires_delta=timedelta(hours=1)
         )
 
         # Send reset email
         from .email import EmailService
+
         await EmailService.send_password_reset_email(user.email, reset_token)
 
-    async def reset_password(
-        self,
-        db: Session,
-        token: str,
-        new_password: str
-    ) -> None:
+    async def reset_password(self, db: Session, token: str, new_password: str) -> None:
         """Reset password using reset token"""
         try:
             payload = jwt.decode(
-                token,
-                settings.SECRET_KEY,
-                algorithms=[settings.JWT_ALGORITHM]
+                token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
             )
             email = payload.get("sub")
             token_type = payload.get("type")
@@ -205,17 +196,12 @@ class AuthService:
 
         # Invalidate all refresh tokens
         db.query(RefreshToken).filter(
-            RefreshToken.user_id == user.id,
-            RefreshToken.expires_at > datetime.utcnow()
+            RefreshToken.user_id == user.id, RefreshToken.expires_at > datetime.utcnow()
         ).update({"expires_at": datetime.utcnow()})
         db.commit()
 
     async def change_password(
-        self,
-        db: Session,
-        user: User,
-        current_password: str,
-        new_password: str
+        self, db: Session, user: User, current_password: str, new_password: str
     ) -> None:
         """Change user's password"""
         if not verify_password(current_password, user.hashed_password):
@@ -226,7 +212,6 @@ class AuthService:
 
         # Invalidate all refresh tokens
         db.query(RefreshToken).filter(
-            RefreshToken.user_id == user.id,
-            RefreshToken.expires_at > datetime.utcnow()
+            RefreshToken.user_id == user.id, RefreshToken.expires_at > datetime.utcnow()
         ).update({"expires_at": datetime.utcnow()})
         db.commit()
