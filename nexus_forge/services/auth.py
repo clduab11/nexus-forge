@@ -6,17 +6,17 @@ from fastapi import HTTPException, status
 import jwt
 from jwt.exceptions import PyJWTError
 
-from ...models import User, RefreshToken
-from ...api.schemas.auth import UserCreate, Token
-from ...api.schemas.oauth import OAuthProvider, OAuthUserData
-from ...api.dependencies.oauth import (
+from ..models import User, RefreshToken
+from ..api.schemas.auth import UserCreate, Token
+from ..api.schemas.oauth import OAuthProvider, OAuthUserData
+from ..api.dependencies.oauth import (
     google_oauth,
     github_oauth,
     facebook_oauth,
     instagram_oauth
 )
-from ...config import settings
-from ...api.dependencies.auth import (
+from ..config import settings
+from ..api.dependencies.auth import (
     get_password_hash,
     verify_password,
     create_access_token,
@@ -172,7 +172,7 @@ class AuthService:
         )
 
         # Send reset email
-        from ..services.email import EmailService
+        from .email import EmailService
         await EmailService.send_password_reset_email(user.email, reset_token)
 
     async def reset_password(

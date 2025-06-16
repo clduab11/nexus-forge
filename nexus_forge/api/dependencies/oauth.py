@@ -18,7 +18,7 @@ from ..schemas.oauth import (
     OAuthError,
     OAuthTokenResponse
 )
-from ..config import settings
+from ...config import settings
 
 class OAuthClient:
     """Base OAuth client implementation"""

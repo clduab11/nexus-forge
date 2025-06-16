@@ -22,8 +22,8 @@ from ..schemas.auth import (
     RefreshTokenRequest
 )
 from ..schemas.oauth import OAuthProvider
-from ...services.services.auth import AuthService
-from ...services.services.email import EmailService
+from ...services.auth import AuthService
+from ...services.email import EmailService
 from ...models import User, RefreshToken
 from ...config import settings
 

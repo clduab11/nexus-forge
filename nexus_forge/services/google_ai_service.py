@@ -5,8 +5,8 @@ Unified Google AI Service - Integrates all Google Cloud AI capabilities
 import asyncio
 from typing import Dict, Any, List, Optional
 import logging
-from ..integrations.integrations.imagen_integration import ImagenIntegration
-from ..integrations.integrations.veo_integration import VeoIntegration
+from ..integrations.imagen_integration import ImagenIntegration
+from ..integrations.veo_integration import VeoIntegration
 from ..integrations.google.gemini_client import GeminiClient
 from ..integrations.google.jules_integration import JulesIntegration
 from ..core.google_cloud_auth import GoogleCloudAuth, GoogleCloudConfig, AIServiceManager

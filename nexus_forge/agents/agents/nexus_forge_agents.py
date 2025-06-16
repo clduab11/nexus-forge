@@ -15,8 +15,8 @@ from vertexai.preview.generative_models import GenerativeModel, Tool
 import logging
 
 # Import Veo 3 and Imagen 4 integrations
-from ...integrations.integrations.veo_integration import VeoIntegration
-from ...integrations.integrations.imagen_integration import ImagenIntegration
+from ...integrations.veo_integration import VeoIntegration
+from ...integrations.imagen_integration import ImagenIntegration
 # Import Jules client for autonomous coding
 from ...integrations.google.jules_client import JulesClient, JulesTaskType
 

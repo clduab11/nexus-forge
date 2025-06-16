@@ -558,7 +558,7 @@ async def mock_starri_orchestrator():
 @pytest_asyncio.fixture
 async def mock_veo_integration():
     """Mock Veo 3 integration for testing"""
-    with patch('nexus_forge.integrations.integrations.veo_integration.VeoIntegration') as mock_class:
+    with patch('nexus_forge.integrations.veo_integration.VeoIntegration') as mock_class:
         veo = AsyncMock()
         mock_class.return_value = veo
         
@@ -578,7 +578,7 @@ async def mock_veo_integration():
 @pytest_asyncio.fixture
 async def mock_imagen_integration():
     """Mock Imagen 4 integration for testing"""
-    with patch('nexus_forge.integrations.integrations.imagen_integration.ImagenIntegration') as mock_class:
+    with patch('nexus_forge.integrations.imagen_integration.ImagenIntegration') as mock_class:
         imagen = AsyncMock()
         mock_class.return_value = imagen
         
