@@ -54,3 +54,7 @@ __pycache__/
 .coverage
 htmlcov/
 .git/
+
+# MCP Configuration (contains API keys)
+.roo/
+mcp.json
