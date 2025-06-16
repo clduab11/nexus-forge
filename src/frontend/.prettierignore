@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Production
+build/
+dist/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.min.js
+*.min.css
+public/
+*.log

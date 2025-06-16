@@ -1,0 +1,14 @@
+2025-06-16 09:18:58,776 - nexus_forge.core.monitoring - ERROR - Failed to start Prometheus server: [Errno 48] Address already in use
+2025-06-16 09:19:00,973 - nexus_forge.core.cache - INFO - Redis connection established successfully
+ImportError while loading conftest '/Users/chrisdukes/Desktop/projects/nexus-forge-alpha/nexus-forge/tests/conftest.py'.
+tests/conftest.py:60: in <module>
+    from nexus_forge.main import app
+nexus_forge/main.py:22: in <module>
+    from .api.routers import auth, nexus_forge, adk, health, subscription
+nexus_forge/api/routers/auth.py:25: in <module>
+    from ...services.services.auth import AuthService
+nexus_forge/services/services/auth.py:12: in <module>
+    from ...api.dependencies.oauth import (
+nexus_forge/api/dependencies/oauth.py:21: in <module>
+    from ..config import settings
+E   ModuleNotFoundError: No module named 'nexus_forge.api.config'
