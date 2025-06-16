@@ -6,7 +6,7 @@
 [![Google ADK](https://img.shields.io/badge/Google-ADK%20Integrated-4285F4?style=for-the-badge&logo=google)](https://cloud.google.com)
 [![Agent2Agent](https://img.shields.io/badge/Agent2Agent-Protocol%20LIVE-34A853?style=for-the-badge)](https://github.com)
 [![Production Ready](https://img.shields.io/badge/Production-DEPLOYED-00C851?style=for-the-badge)](https://github.com)
-[![SPARC Complete](https://img.shields.io/badge/SPARC-COMPLETE-FF6900?style=for-the-badge)](./docs/updated-sparc-workflow.md)
+[![SPARC Complete](https://img.shields.io/badge/SPARC-COMPLETE-FF6900?style=for-the-badge)](../docs/updated-sparc-workflow.md)
 
 ---
 

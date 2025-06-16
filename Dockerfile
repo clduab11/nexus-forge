@@ -74,7 +74,7 @@ RUN mkdir -p /app/logs /app/cache /app/uploads /tmp && \
     chown -R nexus:nexus /app /tmp
 
 # Copy application code
-COPY --chown=nexus:nexus nexus_forge/ ./nexus_forge/
+COPY --chown=nexus:nexus src/ ./src/
 COPY --chown=nexus:nexus config/ ./config/
 
 # Copy static files if they exist
@@ -101,7 +101,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 EXPOSE 8080 8090
 
 # Use exec form for better signal handling
-CMD ["python", "-m", "nexus_forge.main"]
+CMD ["python", "-m", "src.backend.main"]
 
 # =============================================================================
 # Stage 4: Development image (optional)
@@ -137,7 +137,7 @@ ENV ENVIRONMENT=development \
     LOG_LEVEL=debug
 
 # Development command
-CMD ["python", "-m", "nexus_forge.main", "--reload"]
+CMD ["python", "-m", "src.backend.main", "--reload"]
 
 # =============================================================================
 # Labels for metadata

@@ -417,7 +417,7 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        "nexus_forge.main:app",
+        "src.backend.main:app",
         host="0.0.0.0",
         port=8000,
         reload=os.getenv("ENVIRONMENT") == "development",

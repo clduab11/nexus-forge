@@ -102,11 +102,11 @@ Issues = "https://github.com/nexus-forge/nexus-forge/issues"
 Changelog = "https://github.com/nexus-forge/nexus-forge/blob/main/CHANGELOG.md"
 
 [project.scripts]
-nexus-forge = "nexus_forge.cli:main"
+nexus-forge = "src.backend.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["nexus_forge*"]
+include = ["src.backend*"]
 exclude = ["tests*", "docs*"]
 
 [tool.black]
@@ -132,7 +132,7 @@ exclude = '''
 profile = "black"
 multi_line_output = 3
 line_length = 88
-known_first_party = ["nexus_forge"]
+known_first_party = ["src.backend"]
 
 [tool.mypy]
 python_version = "3.10"
@@ -174,7 +174,7 @@ markers = [
 asyncio_mode = "auto"
 
 [tool.coverage.run]
-source = ["nexus_forge"]
+source = ["src.backend"]
 omit = [
     "*/tests/*",
     "*/migrations/*",
