@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-06-15T21:40:55.385467",
+  "overall_status": true,
+  "success_rate": 100.0,
+  "passed_tests": 5,
+  "total_tests": 5,
+  "results": {
+    "core_imports": true,
+    "gemini_integration": true,
+    "documentation": true,
+    "project_structure": true,
+    "configuration": true
+  }
+}
