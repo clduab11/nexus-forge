@@ -184,6 +184,25 @@ class NexusForgeAPI {
     const response = await this.api.get('/api/nexus-forge/metrics');
     return response.data;
   }
+
+  // Batch Processing (Performance Optimization)
+  async createBatchProject(batchData: {
+    tasks: any[];
+    batch_id: string;
+  }): Promise<{ batch_id: string; status: string }> {
+    const response = await this.api.post('/api/nexus-forge/batch/projects', batchData);
+    return response.data;
+  }
+
+  async getBatchStatus(batchId: string): Promise<{
+    batch_id: string;
+    status: 'pending' | 'processing' | 'completed' | 'failed';
+    results: Array<{ success: boolean; result?: any; error?: string }>;
+    error?: string;
+  }> {
+    const response = await this.api.get(`/api/nexus-forge/batch/${batchId}/status`);
+    return response.data;
+  }
 }
 
 export const nexusForgeApi = new NexusForgeAPI();

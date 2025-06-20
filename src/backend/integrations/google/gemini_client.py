@@ -13,19 +13,19 @@ import aiohttp
 import google.generativeai as genai
 from google.api_core import exceptions as google_exceptions
 
-from nexus_forge.core.caching_decorators import (
+from ...core.caching_decorators import (
     CacheStrategy,
     cache_ai_response,
     conditional_cache,
     semantic_cache,
 )
-from nexus_forge.core.error_handling import (
+from ...core.error_handling import (
     CircuitBreaker,
     async_retry,
     handle_ai_service_error_async,
     retry,
 )
-from nexus_forge.core.exceptions import (
+from ...core.exceptions import (
     AuthenticationError,
     InvalidAPIKeyError,
     ModelNotFoundError,
@@ -35,7 +35,7 @@ from nexus_forge.core.exceptions import (
     RateLimitError,
     ServiceUnavailableError,
 )
-from nexus_forge.core.monitoring import create_ai_operation_monitor
+from ...core.monitoring import create_ai_operation_monitor
 
 logger = logging.getLogger(__name__)
 

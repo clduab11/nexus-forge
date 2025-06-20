@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Callable, Dict, Optional, Type, TypeVar, Union
 
-from nexus_forge.core.exceptions import (
+from .exceptions import (
     AuthenticationError,
     NexusForgeError,
     RateLimitError,

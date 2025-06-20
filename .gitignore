@@ -41,6 +41,10 @@ logs/
 *.sqlite
 *.db
 
+# Memory and Reports
+memory/
+reports/
+
 # OS
 .DS_Store
 Thumbs.db

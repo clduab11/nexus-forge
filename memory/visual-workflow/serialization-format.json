@@ -1,0 +1,18 @@
+{
+  "key": "swarm-development-hierarchical-1750392742375/workflow-developer/workflow-serialization-format",
+  "type": "serialization_format",
+  "summary": "Complete workflow serialization system with TypeScript types and JSON format",
+  "components": [
+    "WorkflowDefinition type system",
+    "Node and Connection types",
+    "Serialization/Deserialization service",
+    "Validation system",
+    "Compression for storage",
+    "Import/Export functionality",
+    "Executable format conversion"
+  ],
+  "files_created": [
+    "src/frontend/src/types/workflow.types.ts",
+    "src/frontend/src/services/workflowSerializer.ts"
+  ]
+}
