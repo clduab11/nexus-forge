@@ -11,10 +11,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from nexus_forge.core.cache import CacheStrategy, RedisCache
-from nexus_forge.core.exceptions import CoordinationError, IntegrationError
-from nexus_forge.integrations.mem0.knowledge_client import Mem0KnowledgeClient
-from nexus_forge.integrations.supabase.coordination_client import (
+from src.backend.core.cache import CacheStrategy, RedisCache
+from src.backend.core.exceptions import CoordinationError, IntegrationError
+from src.backend.integrations.mem0.knowledge_client import Mem0KnowledgeClient
+from src.backend.integrations.supabase.coordination_client import (
     SupabaseCoordinationClient,
 )
 

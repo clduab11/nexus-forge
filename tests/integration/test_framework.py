@@ -13,28 +13,28 @@ from typing import Any, Dict, List, Optional
 
 import pytest
 
-from nexus_forge.ai_features.custom_training import CustomTrainingEngine
-from nexus_forge.ai_features.predictive_coordination import PredictiveCoordinator
-from nexus_forge.ai_features.quality_control import AutonomousQualityController
+from src.backend.ai_features.custom_training import CustomTrainingEngine
+from src.backend.ai_features.predictive_coordination import PredictiveCoordinator
+from src.backend.ai_features.quality_control import AutonomousQualityController
 
 # Import core systems
-from nexus_forge.core.cache import RedisCache
-from nexus_forge.integrations.supabase.coordination_client import (
+from src.backend.core.cache import RedisCache
+from src.backend.integrations.supabase.coordination_client import (
     SupabaseCoordinationClient,
 )
-from nexus_forge.marketplace.performance_benchmarker import PerformanceBenchmarker
+from src.backend.marketplace.performance_benchmarker import PerformanceBenchmarker
 
 # Import all major system components
-from nexus_forge.marketplace.registry import AgentRegistry
-from nexus_forge.marketplace.search_engine import AgentSearchEngine
-from nexus_forge.marketplace.security_scanner import SecurityScanner
-from nexus_forge.multi_region.load_balancer import GlobalLoadBalancer
-from nexus_forge.multi_region.region_manager import RegionManager
-from nexus_forge.multi_tenancy.isolation_manager import IsolationManager
-from nexus_forge.multi_tenancy.tenant_manager import TenantManager
-from nexus_forge.workflow_builder.compiler import WorkflowCompiler
-from nexus_forge.workflow_builder.engine import WorkflowEngine
-from nexus_forge.workflow_builder.executor import WorkflowExecutor
+from src.backend.marketplace.registry import AgentRegistry
+from src.backend.marketplace.search_engine import AgentSearchEngine
+from src.backend.marketplace.security_scanner import SecurityScanner
+from src.backend.multi_region.load_balancer import GlobalLoadBalancer
+from src.backend.multi_region.region_manager import RegionManager
+from src.backend.multi_tenancy.isolation_manager import IsolationManager
+from src.backend.multi_tenancy.tenant_manager import TenantManager
+from src.backend.workflow_builder.compiler import WorkflowCompiler
+from src.backend.workflow_builder.engine import WorkflowEngine
+from src.backend.workflow_builder.executor import WorkflowExecutor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -349,7 +349,7 @@ class IntegrationTestFramework:
             training_engine = self.systems["training_engine"]
 
             # Create mock training job
-            from nexus_forge.ai_features.models import (
+            from src.backend.ai_features.models import (
                 HyperParameters,
                 ModelArchitecture,
                 TrainingDataSource,

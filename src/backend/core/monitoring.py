@@ -457,8 +457,9 @@ class ErrorMetrics:
 
 
 class APILogger:
-    def __init__(self):
-        self.start_prometheus()
+    def __init__(self, start_server: bool = True):
+        if start_server and not os.getenv("TESTING"):
+            self.start_prometheus()
         self.error_metrics = ErrorMetrics()
 
     def start_prometheus(self):
@@ -749,7 +750,7 @@ def setup_monitoring(app):
 
     # Initialize monitoring components
     global api_logger
-    api_logger = APILogger()
+    api_logger = APILogger(start_server=True)
 
     # Add middleware
     app.middleware("http")(RequestLogMiddleware())
@@ -899,8 +900,8 @@ def create_ai_operation_monitor(service_name: str):
     return decorator
 
 
-# Initialize API logger
-api_logger = APILogger()
+# Initialize API logger (but don't start server automatically during imports)
+api_logger = APILogger(start_server=False)
 
 # Initialize structured logger
 structured_logger = StructuredLogger("nexus-forge-api")

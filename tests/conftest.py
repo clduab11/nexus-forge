@@ -262,7 +262,7 @@ def sample_websocket_message():
 @pytest_asyncio.fixture
 async def mock_enhanced_starri_orchestrator():
     """Mock enhanced Starri Orchestrator with deep thinking capabilities"""
-    from nexus_forge.agents.starri.orchestrator import (
+    from src.backend.agents.starri.orchestrator import (
         AgentCapability,
         StarriOrchestrator,
         ThinkingMode,
@@ -349,7 +349,7 @@ async def mock_enhanced_starri_orchestrator():
 @pytest_asyncio.fixture
 async def mock_supabase_coordination():
     """Mock Supabase coordination client"""
-    from nexus_forge.integrations.supabase.coordination_client import (
+    from src.backend.integrations.supabase.coordination_client import (
         SupabaseCoordinationClient,
     )
 
@@ -379,7 +379,7 @@ async def mock_supabase_coordination():
 @pytest_asyncio.fixture
 async def mock_mem0_knowledge():
     """Mock Mem0 knowledge client"""
-    from nexus_forge.integrations.mem0.knowledge_client import Mem0KnowledgeClient
+    from src.backend.integrations.mem0.knowledge_client import Mem0KnowledgeClient
 
     with patch("nexus_forge.integrations.mem0.knowledge_client.RedisCache"):
         client = Mem0KnowledgeClient(api_key="test-key", orchestrator_id="test_orch")
@@ -400,7 +400,7 @@ async def mock_mem0_knowledge():
 @pytest_asyncio.fixture
 async def mock_redis_cache():
     """Mock Redis cache with multi-level caching"""
-    from nexus_forge.core.cache import CacheStrategy, RedisCache
+    from src.backend.core.cache import CacheStrategy, RedisCache
 
     with patch("nexus_forge.core.cache.redis.StrictRedis"):
         cache = RedisCache()
@@ -431,7 +431,7 @@ async def mock_redis_cache():
 @pytest.fixture
 def sample_thinking_modes():
     """Sample data for testing thinking modes"""
-    from nexus_forge.agents.starri.orchestrator import ThinkingMode
+    from src.backend.agents.starri.orchestrator import ThinkingMode
 
     return {
         ThinkingMode.DEEP_ANALYSIS: {
@@ -465,7 +465,7 @@ def sample_thinking_modes():
 @pytest.fixture
 def sample_agent_capabilities():
     """Sample agent capabilities for testing"""
-    from nexus_forge.agents.starri.orchestrator import AgentCapability
+    from src.backend.agents.starri.orchestrator import AgentCapability
 
     return {
         "ui_designer": [AgentCapability.UI_DESIGN, AgentCapability.IMAGE_GENERATION],
@@ -681,7 +681,7 @@ async def mock_nexus_forge_websocket():
 @pytest.fixture
 def sample_app_specification():
     """Sample app specification for testing"""
-    from nexus_forge.agents.agents.nexus_forge_agents import AppSpecification
+    from src.backend.agents.agents.nexus_forge_agents import AppSpecification
 
     return AppSpecification(
         name="Test Analytics App",

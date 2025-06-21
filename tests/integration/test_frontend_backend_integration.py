@@ -15,9 +15,9 @@ import websockets
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
-from nexus_forge.core.auth import create_access_token
-from nexus_forge.integrations.supabase.coordination_client import CoordinationClient
-from nexus_forge.main import app
+from src.backend.core.auth import create_access_token
+from src.backend.integrations.supabase.coordination_client import CoordinationClient
+from src.backend.main import app
 
 
 class TestFrontendBackendIntegration:

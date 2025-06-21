@@ -15,7 +15,7 @@ import pytest
 async def test_supabase_connectivity():
     """Test Supabase database connectivity and basic operations"""
     try:
-        from nexus_forge.integrations.supabase.coordination_client import (
+        from src.backend.integrations.supabase.coordination_client import (
             SupabaseCoordinationClient,
         )
 
@@ -43,7 +43,7 @@ async def test_supabase_connectivity():
 async def test_redis_connectivity():
     """Test Redis cache connectivity and basic operations"""
     try:
-        from nexus_forge.core.cache import RedisCache
+        from src.backend.core.cache import RedisCache
 
         cache = RedisCache()
 
@@ -74,12 +74,12 @@ async def test_redis_connectivity():
 async def test_marketplace_system_health():
     """Test marketplace system component health"""
     try:
-        from nexus_forge.marketplace.performance_benchmarker import (
+        from src.backend.marketplace.performance_benchmarker import (
             PerformanceBenchmarker,
         )
-        from nexus_forge.marketplace.registry import AgentRegistry
-        from nexus_forge.marketplace.search_engine import AgentSearchEngine
-        from nexus_forge.marketplace.security_scanner import SecurityScanner
+        from src.backend.marketplace.registry import AgentRegistry
+        from src.backend.marketplace.search_engine import AgentSearchEngine
+        from src.backend.marketplace.security_scanner import SecurityScanner
 
         # Test component instantiation
         registry = AgentRegistry()
@@ -104,9 +104,9 @@ async def test_marketplace_system_health():
 async def test_workflow_system_health():
     """Test workflow system component health"""
     try:
-        from nexus_forge.workflow_builder.compiler import WorkflowCompiler
-        from nexus_forge.workflow_builder.engine import WorkflowEngine
-        from nexus_forge.workflow_builder.executor import WorkflowExecutor
+        from src.backend.workflow_builder.compiler import WorkflowCompiler
+        from src.backend.workflow_builder.engine import WorkflowEngine
+        from src.backend.workflow_builder.executor import WorkflowExecutor
 
         # Test component instantiation
         engine = WorkflowEngine()
@@ -129,8 +129,8 @@ async def test_workflow_system_health():
 async def test_multi_tenancy_system_health():
     """Test multi-tenancy system component health"""
     try:
-        from nexus_forge.multi_tenancy.isolation_manager import IsolationManager
-        from nexus_forge.multi_tenancy.tenant_manager import TenantManager
+        from src.backend.multi_tenancy.isolation_manager import IsolationManager
+        from src.backend.multi_tenancy.tenant_manager import TenantManager
 
         # Test component instantiation
         tenant_manager = TenantManager()
@@ -151,8 +151,8 @@ async def test_multi_tenancy_system_health():
 async def test_multi_region_system_health():
     """Test multi-region system component health"""
     try:
-        from nexus_forge.multi_region.load_balancer import GlobalLoadBalancer
-        from nexus_forge.multi_region.region_manager import RegionManager
+        from src.backend.multi_region.load_balancer import GlobalLoadBalancer
+        from src.backend.multi_region.region_manager import RegionManager
 
         # Test component instantiation
         region_manager = RegionManager()
@@ -173,11 +173,11 @@ async def test_multi_region_system_health():
 async def test_ai_features_system_health():
     """Test AI features system component health"""
     try:
-        from nexus_forge.ai_features.custom_training import CustomTrainingEngine
-        from nexus_forge.ai_features.predictive_coordination import (
+        from src.backend.ai_features.custom_training import CustomTrainingEngine
+        from src.backend.ai_features.predictive_coordination import (
             PredictiveCoordinator,
         )
-        from nexus_forge.ai_features.quality_control import AutonomousQualityController
+        from src.backend.ai_features.quality_control import AutonomousQualityController
 
         # Test component instantiation
         training_engine = CustomTrainingEngine()

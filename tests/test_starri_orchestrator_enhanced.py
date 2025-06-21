@@ -11,12 +11,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from nexus_forge.agents.starri.orchestrator import (
+from src.backend.agents.starri.orchestrator import (
     AgentCapability,
     StarriOrchestrator,
     ThinkingMode,
 )
-from nexus_forge.core.exceptions import OrchestrationError, TaskDecompositionError
+from src.backend.core.exceptions import OrchestrationError, TaskDecompositionError
 
 pytestmark = pytest.mark.asyncio
 

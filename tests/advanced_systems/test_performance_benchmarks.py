@@ -13,7 +13,7 @@ import psutil
 import pytest
 
 # Import performance monitoring utilities
-from nexus_forge.features.performance_analytics import (
+from src.backend.features.performance_analytics import (
     MetricType,
     PerformanceAnalyticsOrchestrator,
 )
@@ -92,7 +92,7 @@ class TestAgentSelfImprovementPerformance:
         self, performance_benchmarks, memory_monitor
     ):
         """Test improvement recommendation generation latency"""
-        from nexus_forge.features.agent_self_improvement import (
+        from src.backend.features.agent_self_improvement import (
             AgentSelfImprovementOrchestrator,
         )
 
@@ -157,7 +157,7 @@ class TestAgentSelfImprovementPerformance:
     @pytest.mark.performance
     async def test_concurrent_improvement_requests(self, performance_benchmarks):
         """Test concurrent improvement request handling"""
-        from nexus_forge.features.agent_self_improvement import (
+        from src.backend.features.agent_self_improvement import (
             AgentSelfImprovementOrchestrator,
         )
 
@@ -206,7 +206,7 @@ class TestAdvancedCachingPerformance:
     @pytest.mark.performance
     async def test_cache_lookup_latency(self, performance_benchmarks):
         """Test cache lookup latency across all levels"""
-        from nexus_forge.features.advanced_caching import AdvancedCacheOrchestrator
+        from src.backend.features.advanced_caching import AdvancedCacheOrchestrator
 
         orchestrator = AdvancedCacheOrchestrator()
         orchestrator.cache = AsyncMock()
@@ -251,7 +251,7 @@ class TestAdvancedCachingPerformance:
     @pytest.mark.performance
     async def test_concurrent_cache_operations(self, performance_benchmarks):
         """Test concurrent cache operations performance"""
-        from nexus_forge.features.advanced_caching import AdvancedCacheOrchestrator
+        from src.backend.features.advanced_caching import AdvancedCacheOrchestrator
 
         orchestrator = AdvancedCacheOrchestrator()
         orchestrator.cache = AsyncMock()
@@ -294,7 +294,7 @@ class TestBehaviorAnalysisPerformance:
     @pytest.mark.performance
     async def test_interaction_logging_latency(self, performance_benchmarks):
         """Test interaction logging performance"""
-        from nexus_forge.features.agent_behavior_analysis import (
+        from src.backend.features.agent_behavior_analysis import (
             AgentBehaviorAnalysisOrchestrator,
         )
 
@@ -339,7 +339,7 @@ class TestBehaviorAnalysisPerformance:
     @pytest.mark.performance
     async def test_pattern_analysis_scalability(self, performance_benchmarks):
         """Test pattern analysis with large datasets"""
-        from nexus_forge.features.agent_behavior_analysis import (
+        from src.backend.features.agent_behavior_analysis import (
             AgentBehaviorAnalysisOrchestrator,
         )
 
@@ -389,7 +389,7 @@ class TestPerformanceAnalyticsPerformance:
     @pytest.mark.performance
     async def test_metric_collection_latency(self, performance_benchmarks):
         """Test real-time metric collection latency"""
-        from nexus_forge.features.performance_analytics import (
+        from src.backend.features.performance_analytics import (
             PerformanceAnalyticsOrchestrator,
         )
 
@@ -436,7 +436,7 @@ class TestPerformanceAnalyticsPerformance:
     @pytest.mark.performance
     async def test_anomaly_detection_latency(self, performance_benchmarks):
         """Test anomaly detection response time"""
-        from nexus_forge.features.performance_analytics import (
+        from src.backend.features.performance_analytics import (
             PerformanceAnalyticsOrchestrator,
         )
 
@@ -489,7 +489,7 @@ class TestPerformanceAnalyticsPerformance:
     @pytest.mark.performance
     async def test_metrics_throughput(self, performance_benchmarks):
         """Test metrics processing throughput"""
-        from nexus_forge.features.performance_analytics import (
+        from src.backend.features.performance_analytics import (
             PerformanceAnalyticsOrchestrator,
         )
 
@@ -529,7 +529,7 @@ class TestDynamicModelSelectionPerformance:
     @pytest.mark.performance
     async def test_model_selection_latency(self, performance_benchmarks):
         """Test model selection decision latency"""
-        from nexus_forge.features.dynamic_model_selection import (
+        from src.backend.features.dynamic_model_selection import (
             DynamicModelSelectionOrchestrator,
         )
 
@@ -579,7 +579,7 @@ class TestDynamicModelSelectionPerformance:
     @pytest.mark.performance
     async def test_concurrent_model_selections(self, performance_benchmarks):
         """Test concurrent model selection performance"""
-        from nexus_forge.features.dynamic_model_selection import (
+        from src.backend.features.dynamic_model_selection import (
             DynamicModelSelectionOrchestrator,
         )
 
@@ -630,7 +630,7 @@ class TestMultiModalIntegrationPerformance:
     @pytest.mark.performance
     async def test_cross_modal_translation_latency(self, performance_benchmarks):
         """Test cross-modal translation performance"""
-        from nexus_forge.features.multi_modal_integration import (
+        from src.backend.features.multi_modal_integration import (
             MultiModalIntegrationOrchestrator,
         )
 
@@ -690,7 +690,7 @@ class TestMultiModalIntegrationPerformance:
     @pytest.mark.performance
     async def test_workflow_execution_latency(self, performance_benchmarks):
         """Test multi-modal workflow execution performance"""
-        from nexus_forge.features.multi_modal_integration import (
+        from src.backend.features.multi_modal_integration import (
             MultiModalIntegrationOrchestrator,
         )
 
@@ -815,11 +815,11 @@ class TestSystemOverallPerformance:
         """Test memory usage under concurrent load"""
 
         # Import all systems
-        from nexus_forge.features.advanced_caching import AdvancedCacheOrchestrator
-        from nexus_forge.features.agent_behavior_analysis import (
+        from src.backend.features.advanced_caching import AdvancedCacheOrchestrator
+        from src.backend.features.agent_behavior_analysis import (
             AgentBehaviorAnalysisOrchestrator,
         )
-        from nexus_forge.features.agent_self_improvement import (
+        from src.backend.features.agent_self_improvement import (
             AgentSelfImprovementOrchestrator,
         )
 
@@ -888,7 +888,7 @@ class TestSystemOverallPerformance:
     async def test_error_recovery_performance(self):
         """Test system performance during error conditions"""
 
-        from nexus_forge.features.agent_self_improvement import (
+        from src.backend.features.agent_self_improvement import (
             AgentSelfImprovementOrchestrator,
         )
 

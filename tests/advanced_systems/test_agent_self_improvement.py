@@ -9,8 +9,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from nexus_forge.core.cache import RedisCache
-from nexus_forge.features.agent_self_improvement import (
+from src.backend.core.cache import RedisCache
+from src.backend.features.agent_self_improvement import (
     AgentSelfImprovementOrchestrator,
     AutomatedCodeReviewer,
     CollaborativeDebateSystem,

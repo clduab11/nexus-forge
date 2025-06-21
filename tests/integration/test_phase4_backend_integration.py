@@ -17,14 +17,14 @@ from fastapi.testclient import TestClient
 from fastapi.websockets import WebSocket
 from httpx import AsyncClient
 
-from nexus_forge.agents.starri.orchestrator import AgentCapability, StarriOrchestrator
-from nexus_forge.integrations.supabase.coordination_client import (
+from src.backend.agents.starri.orchestrator import AgentCapability, StarriOrchestrator
+from src.backend.integrations.supabase.coordination_client import (
     SupabaseCoordinationClient,
 )
 
 # Import the main application and components
-from nexus_forge.main import app
-from nexus_forge.websockets.manager import WebSocketManager
+from src.backend.main import app
+from src.backend.websockets.manager import WebSocketManager
 
 
 class TestStarriOrchestration:
@@ -344,7 +344,7 @@ class TestNexusForgeAPIIntegration:
     async def test_build_status_endpoint(self, mock_app_components):
         """Test build status retrieval"""
         # Setup active session
-        from nexus_forge.api.routers.nexus_forge import active_sessions
+        from src.backend.api.routers.nexus_forge import active_sessions
 
         session_id = "session_456"
         active_sessions[session_id] = {
@@ -550,7 +550,7 @@ def test_app():
 async def setup_test_environment():
     """Setup test environment before each test"""
     # Reset any global state
-    from nexus_forge.api.routers.nexus_forge import active_sessions
+    from src.backend.api.routers.nexus_forge import active_sessions
 
     active_sessions.clear()
 

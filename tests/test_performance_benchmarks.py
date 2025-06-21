@@ -13,7 +13,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from nexus_forge.agents.starri.orchestrator import ThinkingMode
+from src.backend.agents.starri.orchestrator import ThinkingMode
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.performance]
 
@@ -327,7 +327,7 @@ class TestCachePerformance:
 
     async def test_cache_strategy_performance(self, mock_redis_cache):
         """Benchmark different caching strategies"""
-        from nexus_forge.core.cache import CacheStrategy
+        from src.backend.core.cache import CacheStrategy
 
         cache = mock_redis_cache
 

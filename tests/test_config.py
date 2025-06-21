@@ -5,7 +5,7 @@ Test-specific configuration that overrides production settings
 import os
 from typing import Optional
 
-from nexus_forge.config import Settings
+from src.backend.config import Settings
 
 
 class TestSettings(Settings):
