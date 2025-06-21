@@ -57,10 +57,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from nexus_forge.core.auth import get_current_user
-from nexus_forge.database import Base, get_db
-from nexus_forge.main import app
-from nexus_forge.models import User
+from src.backend.core.auth import get_current_user
+from src.backend.database import Base, get_db
+from src.backend.main import app
+from src.backend.models import User
 
 # Test database URL
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
