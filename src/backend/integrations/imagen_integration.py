@@ -6,20 +6,16 @@ UI mockups, design systems, and visual prototypes.
 """
 
 import asyncio
-import base64
-import io
-import json
 import logging
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import aiohttp
 import google.auth
 from google.auth.transport.requests import Request
 from google.cloud import aiplatform
 from google.oauth2 import service_account
-from PIL import Image
 
 from nexus_forge.core.caching_decorators import (
     CacheStrategy,

@@ -15,9 +15,9 @@ from unittest.mock import AsyncMock, Mock, call, patch
 
 import pytest
 
-from nexus_forge.agents.agents.nexus_forge_agents import StarriOrchestrator
-from nexus_forge.api.v1.nexus_forge_router import nexus_forge_router
-from nexus_forge.services.google_ai_service import GoogleAIService
+from src.backend.agents.agents.nexus_forge_agents import StarriOrchestrator
+from src.backend.api.v1.nexus_forge_router import src.backend_router
+from src.backend.services.google_ai_service import GoogleAIService
 
 
 @pytest.mark.integration

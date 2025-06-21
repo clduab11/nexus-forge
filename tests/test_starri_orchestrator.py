@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 import pytest_asyncio
 
-from nexus_forge.agents.agents.nexus_forge_agents import (
+from src.backend.agents.agents.nexus_forge_agents import (
     AppSpecification,
     ModelType,
     StarriOrchestrator,

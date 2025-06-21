@@ -3,23 +3,17 @@ AI/ML-based Anomaly Detection and Threat Intelligence System
 Implements advanced threat detection using machine learning models
 """
 
-import asyncio
-import json
 import numpy as np
-import pickle
 from collections import defaultdict, deque
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 
-import httpx
-from scipy import stats
 from sklearn.ensemble import IsolationForest, RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 
-from ...core.exceptions import SecurityError
 from ...core.monitoring import get_logger
 
 logger = get_logger(__name__)

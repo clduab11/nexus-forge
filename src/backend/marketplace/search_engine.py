@@ -2,12 +2,10 @@
 Marketplace search engine with semantic search capabilities
 """
 
-import asyncio
 import re
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
 
 from ..core.cache import RedisCache
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient

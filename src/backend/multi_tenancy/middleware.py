@@ -6,8 +6,7 @@ Provides tenant isolation and context injection for all requests
 import asyncio
 import logging
 import re
-from typing import Any, Callable, Dict, Optional, Union
-from urllib.parse import urlparse
+from typing import Callable, Optional
 
 import jwt
 from fastapi import HTTPException, Request, status
@@ -16,7 +15,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 
 from ..core.cache import RedisCache
-from ..core.exceptions import NotFoundError, PermissionError, ValidationError
+from ..core.exceptions import NotFoundError
 from .models import Tenant, TenantStatus, TenantTier
 from .tenant_manager import TenantManager
 

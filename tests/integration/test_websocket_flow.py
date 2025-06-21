@@ -18,8 +18,8 @@ import websockets
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
-from nexus_forge.api.v1.nexus_forge_router import nexus_forge_websocket_endpoint
-from nexus_forge.services.websocket_manager import WebSocketManager
+from src.backend.api.v1.nexus_forge_router import src.backend_websocket_endpoint
+from src.backend.services.websocket_manager import WebSocketManager
 
 
 @pytest.mark.integration

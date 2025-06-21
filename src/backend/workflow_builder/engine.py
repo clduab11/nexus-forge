@@ -3,10 +3,9 @@ Workflow Engine
 Main orchestrator for visual workflow creation, compilation, and execution
 """
 
-import asyncio
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from ..core.cache import RedisCache
 from ..core.exceptions import NotFoundError, ValidationError
@@ -15,7 +14,6 @@ from .compiler import CompiledWorkflow, WorkflowCompiler
 from .executor import WorkflowExecutor
 from .models import (
     ExecutionStatus,
-    NodeType,
     Workflow,
     WorkflowExecution,
     WorkflowNode,

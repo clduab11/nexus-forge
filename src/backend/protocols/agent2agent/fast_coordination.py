@@ -12,17 +12,14 @@ Implements high-performance inter-agent communication with:
 
 import asyncio
 import time
-import uuid
 from collections import defaultdict, deque
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Callable, Set, Tuple
+from typing import Dict, List, Optional, Any, Set
 import logging
 import msgpack
-import numpy as np
-from asyncio import Queue, PriorityQueue
+from asyncio import PriorityQueue
 
-from .core import Agent2AgentMessage, MessageType, ProtocolVersion
+from .core import Agent2AgentMessage, MessageType
 
 logger = logging.getLogger(__name__)
 

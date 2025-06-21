@@ -16,7 +16,7 @@ from unittest.mock import AsyncMock, MagicMock, Mock, call, patch
 
 import pytest
 
-from nexus_forge.agents.agents.nexus_forge_agents import (
+from src.backend.agents.agents.nexus_forge_agents import (
     GeminiFlashAgent,
     GeminiSpecAgent,
     ImagenDesignAgent,
@@ -24,7 +24,7 @@ from nexus_forge.agents.agents.nexus_forge_agents import (
     StarriOrchestrator,
     VeoVideoAgent,
 )
-from nexus_forge.services.google_ai_service import GoogleAIService
+from src.backend.services.google_ai_service import GoogleAIService
 
 
 @pytest.mark.integration

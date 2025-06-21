@@ -3,7 +3,7 @@
 import logging
 import time
 import traceback
-from typing import Callable, Optional
+from typing import Callable
 
 from fastapi import Request, Response
 from fastapi.routing import APIRoute
@@ -11,7 +11,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 
 from .cloud_monitoring import CloudMonitoringService
-from .metrics_config import APP_METRICS
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,6 @@ Enables multiple users to collaborate on research projects with real-time
 updates, shared knowledge graphs, and coordinated agent work.
 """
 
-import asyncio
 import logging
 import uuid
 from dataclasses import asdict, dataclass

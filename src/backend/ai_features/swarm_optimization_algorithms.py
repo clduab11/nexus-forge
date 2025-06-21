@@ -3,24 +3,17 @@ Bio-Inspired Swarm Optimization Algorithms
 Implementation of PSO, ACO, BCO, Firefly and other nature-inspired algorithms
 """
 
-import asyncio
-import json
-import logging
 import math
 import random
 import time
-from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Set, Any, Callable, Dict, List, Optional, Tuple
 from uuid import uuid4
 
 import numpy as np
 import networkx as nx
-from scipy.spatial.distance import euclidean, cityblock
-from scipy.stats import levy
+from scipy.spatial.distance import euclidean
 
-from nexus_forge.core.exceptions import OptimizationError
 from nexus_forge.core.monitoring import get_logger
 
 logger = get_logger(__name__)

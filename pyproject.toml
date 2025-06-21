@@ -194,6 +194,12 @@ exclude_lines = [
 ]
 
 [tool.ruff]
+# Same as Black.
+line-length = 88
+# Assume Python 3.10.
+target-version = "py310"
+
+[tool.ruff.lint]
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
 select = [
     "E",    # pycodestyle errors
@@ -253,35 +259,29 @@ ignore = [
     "D107",  # Missing docstring in __init__
     "D401",  # First line should be in imperative mood
     "D413",  # Missing blank line after last section
-    "ANN101",# Missing type annotation for self in method
-    "ANN102",# Missing type annotation for cls in classmethod
     "ANN204",# Missing return type annotation for special method
     "S101",  # Use of assert detected
     "B008",  # Do not perform function call in argument defaults
     "COM812",# Missing trailing comma
     "ISC001",# Implicit string concatenation
 ]
-# Same as Black.
-line-length = 88
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-# Assume Python 3.10.
-target-version = "py310"
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "ARG", "FBT", "PLR2004", "S", "TID"]
 "nexus_forge/cli.py" = ["T201"]  # Allow print in CLI
 "nexus_forge/migrations/*" = ["D", "ANN"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["nexus_forge"]
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 # Unlike Flake8, default to a complexity level of 10.
 max-complexity = 10
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.pylint]
+[tool.ruff.lint.pylint]
 max-args = 6

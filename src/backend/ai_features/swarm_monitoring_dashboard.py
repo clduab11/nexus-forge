@@ -4,29 +4,22 @@ Real-time monitoring, visualization, and analytics for swarm intelligence system
 """
 
 import asyncio
-import json
-import logging
-import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import AsyncIterator, Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 
 import numpy as np
-import pandas as pd
 from scipy import stats
 
-from nexus_forge.core.cache import CacheStrategy, RedisCache
 from nexus_forge.core.monitoring import get_logger
-from nexus_forge.integrations.supabase.coordination_client import SupabaseCoordinationClient
 
 from .swarm_intelligence import (
+import time
     SwarmAgent,
     SwarmMessage,
-    SwarmObjective,
     SwarmTask,
-    SwarmResult,
     CommunicationType,
     EmergenceBehavior,
     SwarmPattern,

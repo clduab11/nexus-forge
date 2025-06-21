@@ -4,29 +4,24 @@ LSTM/Transformer-based prediction for agent coordination and resource optimizati
 """
 
 import asyncio
-import json
 import logging
-from collections import defaultdict, deque
+from collections import deque
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from scipy import stats
 from sklearn.preprocessing import MinMaxScaler
 
 from ..core.cache import RedisCache
-from ..core.exceptions import NotFoundError, ResourceError, ValidationError
+from ..core.exceptions import ResourceError, ValidationError
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
 from .models import (
     CoordinationPrediction,
     ModelArchitecture,
     PredictionModel,
-    PredictionRequest,
-    PredictionResponse,
-    PredictionType,
 )
 
 logger = logging.getLogger(__name__)

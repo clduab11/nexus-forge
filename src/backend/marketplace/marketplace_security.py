@@ -3,31 +3,22 @@ Comprehensive Security Framework for Marketplace
 Advanced security validation and protection mechanisms
 """
 
-import asyncio
 import hashlib
-import hmac
-import json
 import os
 import re
-import tempfile
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 
 import jwt
 import yara
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.x509 import Certificate, load_pem_x509_certificate
+from cryptography.x509 import Certificate
 
-from ...core.exceptions import SecurityException, ValidationError
+from ...core.exceptions import SecurityException
 from ...core.logging import get_logger
-from ..security.scanner import BaseSecurityScanner
 
 logger = get_logger(__name__)
 

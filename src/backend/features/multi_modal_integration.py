@@ -24,17 +24,13 @@ import asyncio
 import hashlib
 import json
 import logging
-import math
 import statistics
 import time
-import traceback
 import uuid
 from collections import defaultdict, deque
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict, dataclass, field
-from datetime import datetime, timedelta
+from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -47,8 +43,7 @@ except ImportError:
     FAISS_AVAILABLE = False
     logger.warning("FAISS not available, using fallback vector operations")
 
-from ..core.cache import CacheStrategy, RedisCache
-from ..core.monitoring import PerformanceMonitor
+from ..core.cache import RedisCache
 
 logger = logging.getLogger(__name__)
 

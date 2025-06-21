@@ -5,18 +5,16 @@ Implements global load balancing, auto-scaling, and distributed system patterns
 
 import asyncio
 import hashlib
-import json
 import random
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from uuid import uuid4
 
 import aioredis
 import httpx
-from pydantic import BaseModel, Field
 
 from ...core.exceptions import ScalabilityError, ServiceUnavailableError
 from ...core.monitoring import get_logger

@@ -4,18 +4,15 @@ Enables integration with Google's open-source agent framework
 Supports Agent2Agent protocol for cross-framework communication
 """
 
-import asyncio
-import json
-import logging
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional
 from uuid import uuid4
 
 import httpx
 from pydantic import BaseModel, ValidationError
 
-from nexus_forge.core.exceptions import AgentError, IntegrationError
+from nexus_forge.core.exceptions import IntegrationError
 from nexus_forge.core.monitoring import get_logger
 from nexus_forge.integrations.supabase.coordination_client import (
     SupabaseCoordinationClient,
@@ -256,7 +253,7 @@ class GoogleADKIntegration:
                 json=message_data,
                 headers={
                     "Content-Type": "application/json",
-                    "User-Agent": f"nexus-forge-adk/1.0.0",
+                    "User-Agent": "nexus-forge-adk/1.0.0",
                 },
             )
 

@@ -1,30 +1,24 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Dict
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, EmailStr
+from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
-from ...config import settings
 from ...models import RefreshToken, User
 from ...services.auth import AuthService
 from ...services.email import EmailService
 from ..dependencies.auth import (
     authenticate_user,
     create_access_token,
-    create_refresh_token,
     get_current_user,
-    get_password_hash,
-    verify_refresh_token,
 )
 from ..dependencies.database import get_db
 from ..schemas.auth import (
     RefreshTokenRequest,
     Token,
-    TokenData,
     UserCreate,
-    UserResponse,
 )
 from ..schemas.oauth import OAuthProvider
 

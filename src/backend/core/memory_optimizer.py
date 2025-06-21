@@ -6,7 +6,6 @@ Advanced memory management and optimization for AI agents and database operation
 import asyncio
 import gc
 import logging
-import os
 import psutil
 import sys
 import tracemalloc

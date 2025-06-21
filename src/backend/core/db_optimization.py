@@ -5,27 +5,25 @@ Provides optimized query patterns, caching, and batch operations for maximum thr
 
 import asyncio
 import hashlib
-import json
 import logging
 import time
 from collections import defaultdict
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union
+from datetime import datetime
+from typing import Any, Dict, List, Optional, TypeVar
 
-from sqlalchemy import and_, func, or_, select, update
+from sqlalchemy import and_, func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session, selectinload, joinedload, subqueryload, contains_eager
-from sqlalchemy.sql import Select
+from sqlalchemy.orm import selectinload
 
 from ..models import (
     User, ResearchTask, ResearchAnalytics, ResearchSource, 
-    ModelResult, APIKey, RefreshToken, Subscription,
-    Transaction, QueryCredit, QueryUsage
+    ModelResult, Subscription,
+    QueryCredit, QueryUsage
 )
-from .cache import RedisCache, CacheStrategy
-from .caching_decorators import cache_with_ttl, cache_ai_response
+from .cache import RedisCache
+from .caching_decorators import cache_with_ttl
 
 logger = logging.getLogger(__name__)
 
@@ -530,8 +528,6 @@ async def get_query_performance_report() -> Dict[str, Any]:
 # Memory store optimization results
 async def store_optimization_results():
     """Store optimization findings to memory"""
-    import hashlib
-    import json
     
     findings = {
         "timestamp": time.time(),

@@ -3,22 +3,20 @@ Health check endpoints for comprehensive system monitoring
 """
 
 import asyncio
-import json
 import os
 import time
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Dict, Optional
 
 import aiohttp
 import psutil
 import redis
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 
 from nexus_forge.core.monitoring import (
     api_logger,
-    create_correlation_context,
     get_health_dashboard,
     get_request_context,
 )

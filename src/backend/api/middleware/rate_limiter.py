@@ -7,7 +7,6 @@ Provides Redis-based rate limiting with configurable windows and limits.
 import hashlib
 import logging
 import time
-from datetime import datetime, timedelta
 from typing import Callable, Optional
 
 import redis.asyncio as redis

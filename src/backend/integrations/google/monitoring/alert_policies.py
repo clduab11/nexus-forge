@@ -1,11 +1,8 @@
 """Alert policy configurations for Parallax Pal monitoring."""
 
-import json
 import logging
-from datetime import timedelta
-from typing import Any, Dict, List
+from typing import Dict
 
-from google.api_core import retry
 from google.cloud import monitoring_v3
 
 logger = logging.getLogger(__name__)

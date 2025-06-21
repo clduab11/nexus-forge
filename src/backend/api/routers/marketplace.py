@@ -2,8 +2,6 @@
 Marketplace API endpoints for agent discovery and distribution
 """
 
-import os
-import tempfile
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile

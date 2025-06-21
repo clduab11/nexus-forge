@@ -16,10 +16,10 @@ import psutil
 import pytest
 from fastapi.testclient import TestClient
 
-from nexus_forge.agents.starri.orchestrator import StarriOrchestrator
-from nexus_forge.core.auth import create_access_token
-from nexus_forge.integrations.supabase.coordination_client import CoordinationClient
-from nexus_forge.main import app
+from src.backend.agents.starri.orchestrator import StarriOrchestrator
+from src.backend.core.auth import create_access_token
+from src.backend.integrations.supabase.coordination_client import CoordinationClient
+from src.backend.main import app
 
 
 class PerformanceBenchmarks:

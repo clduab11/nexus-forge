@@ -14,9 +14,9 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from httpx import AsyncClient
 
-from nexus_forge.agents.starri.orchestrator import StarriOrchestrator
-from nexus_forge.main import app
-from nexus_forge.websockets.manager import WebSocketManager
+from src.backend.agents.starri.orchestrator import StarriOrchestrator
+from src.backend.main import app
+from src.backend.websockets.manager import WebSocketManager
 
 
 class TestStarriPerformance:

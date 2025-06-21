@@ -7,7 +7,7 @@ import asyncio
 import time
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Tuple
+from typing import List
 import matplotlib.pyplot as plt
 from datetime import datetime, timezone
 
@@ -20,7 +20,6 @@ from .swarm_intelligence import (
 from .swarm_coordination_patterns import (
     HierarchicalSwarmCoordinator,
     MeshSwarmCoordinator,
-    DistributedSwarmCoordinator,
 )
 from .swarm_coordination_optimized import (
     UltraFastSwarmCoordinator,
@@ -242,9 +241,9 @@ class SwarmLatencyBenchmark:
             
             # Check if we meet <50ms target
             if optimized['avg_latency_ms'] < 50:
-                logger.info(f"  ✓ MEETS <50ms TARGET")
+                logger.info("  ✓ MEETS <50ms TARGET")
             else:
-                logger.info(f"  ✗ Does not meet <50ms target")
+                logger.info("  ✗ Does not meet <50ms target")
                 
     def generate_report(self, df: pd.DataFrame) -> str:
         """Generate detailed benchmark report"""
@@ -302,7 +301,6 @@ class SwarmLatencyBenchmark:
         
     def plot_results(self, df: pd.DataFrame):
         """Plot benchmark results"""
-        import matplotlib.pyplot as plt
         
         fig, axes = plt.subplots(2, 2, figsize=(12, 10))
         fig.suptitle('Swarm Coordination Latency Benchmark Results', fontsize=16)

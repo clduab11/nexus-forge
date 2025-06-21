@@ -9,7 +9,6 @@ import os
 import time
 from typing import Any, AsyncIterator, Dict, List, Optional
 
-import aiohttp
 import google.generativeai as genai
 from google.api_core import exceptions as google_exceptions
 
@@ -23,7 +22,6 @@ from ...core.error_handling import (
     CircuitBreaker,
     async_retry,
     handle_ai_service_error_async,
-    retry,
 )
 from ...core.exceptions import (
     AuthenticationError,
@@ -341,7 +339,7 @@ class GeminiClient:
             raise ModelTimeoutError(
                 "Gemini API request timeout", model="gemini-2.0-flash-exp", timeout=30.0
             ) from e
-        except Exception as e:
+        except Exception:
             # Let the exception handler in the calling method handle this
             raise
 
@@ -398,7 +396,7 @@ class GeminiClient:
                     model="gemini-2.0-flash-exp",
                     timeout=30.0,
                 ) from e
-            except Exception as e:
+            except Exception:
                 # Let the calling method handle exception conversion
                 raise
 

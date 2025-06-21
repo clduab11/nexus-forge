@@ -10,7 +10,6 @@ Integrates with Jules (jules.google) - Google's autonomous coding agent that:
 """
 
 import asyncio
-import json
 import logging
 import os
 from dataclasses import dataclass
@@ -18,7 +17,6 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-import aiohttp
 
 from nexus_forge.core.caching_decorators import (
     CacheStrategy,

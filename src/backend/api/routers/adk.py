@@ -5,16 +5,11 @@ This module provides API endpoints for interacting with the ADK-based agent syst
 including research requests, status checks, and configuration management for Starri.
 """
 
-import asyncio
-import json
 import logging
-import os
-import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, WebSocket, status
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -22,11 +17,9 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..dependencies.auth import get_current_user
 from ..models import User
-from ..schemas.auth import UserOut
 from ..services.adk_service import get_adk_service
 
 # Import WebSocket manager and ADK service
-from ..websocket_adk import adk_websocket_manager
 
 # Removed unused imports - using ADK service layer instead
 

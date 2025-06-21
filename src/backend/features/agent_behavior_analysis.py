@@ -19,23 +19,19 @@ Key Features:
 """
 
 import asyncio
-import hashlib
 import json
 import logging
-import math
 import time
 import uuid
 from collections import defaultdict, deque
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
 from ..core.cache import RedisCache
-from ..core.monitoring import PerformanceMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -270,7 +266,7 @@ class InteractionLogger:
         }
 
         # Cache for dashboard access
-        await self.cache.set_l1(f"realtime_interaction", streaming_data)
+        await self.cache.set_l1("realtime_interaction", streaming_data)
 
     async def _performance_monitoring_worker(self):
         """Monitor logging performance"""

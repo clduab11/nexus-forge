@@ -3,28 +3,24 @@ Global Load Balancer
 Handles intelligent traffic routing across regions
 """
 
-import asyncio
 import logging
 import math
 import random
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import geoip2.database
 import geoip2.errors
 
 from ..core.cache import RedisCache
-from ..core.exceptions import NotFoundError, ResourceError, ValidationError
+from ..core.exceptions import ResourceError, ValidationError
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
 from .models import (
-    EdgeLocation,
     HealthStatus,
     LoadBalancerConfig,
     LoadBalancingStrategy,
     Region,
-    ResourceMetrics,
-    TrafficRouting,
 )
 from .region_manager import RegionManager
 

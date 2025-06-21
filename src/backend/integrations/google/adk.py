@@ -5,11 +5,10 @@ This module provides the core ADK integration, replacing all fallback patterns
 with proper Google Cloud ADK implementation for multi-agent research.
 """
 
-import asyncio
 import logging
 import os
 from datetime import datetime
-from typing import Any, AsyncGenerator, Dict, List, Optional
+from typing import Any, AsyncGenerator, Dict
 
 import vertexai
 
@@ -83,7 +82,6 @@ except ImportError:
             self.agent = agent
 
 # Standard Google Cloud imports
-from google.cloud import aiplatform
 
 logger = logging.getLogger(__name__)
 
@@ -366,7 +364,7 @@ class ParallaxPalADK:
             yield {
                 "type": "error",
                 "agent": "orchestrator",
-                "content": f"I encountered an error while researching. Please try again.",
+                "content": "I encountered an error while researching. Please try again.",
                 "progress": 100,
                 "metadata": {"error_type": type(e).__name__, "session_id": session_id},
             }

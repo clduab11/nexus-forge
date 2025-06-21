@@ -17,38 +17,38 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from nexus_forge.core.cache import RedisCache
-from nexus_forge.features.advanced_caching import (
+from src.backend.core.cache import RedisCache
+from src.backend.features.advanced_caching import (
     AdvancedCacheOrchestrator,
     PredictionModel,
     get_cache_orchestrator,
 )
-from nexus_forge.features.agent_behavior_analysis import (
+from src.backend.features.agent_behavior_analysis import (
     AgentBehaviorAnalysisOrchestrator,
     AgentBehaviorPattern,
     get_behavior_analysis_orchestrator,
 )
 
 # Import all advanced systems
-from nexus_forge.features.agent_self_improvement import (
+from src.backend.features.agent_self_improvement import (
     AgentSelfImprovementOrchestrator,
     ImprovementStrategy,
     get_self_improvement_orchestrator,
 )
-from nexus_forge.features.dynamic_model_selection import (
+from src.backend.features.dynamic_model_selection import (
     DynamicModelSelectionOrchestrator,
     ModelType,
     SelectionStrategy,
     TaskComplexity,
     get_model_selection_orchestrator,
 )
-from nexus_forge.features.multi_modal_integration import (
+from src.backend.features.multi_modal_integration import (
     ModalityType,
     MultiModalIntegrationOrchestrator,
     WorkflowExecutionStrategy,
     get_multimodal_orchestrator,
 )
-from nexus_forge.features.performance_analytics import (
+from src.backend.features.performance_analytics import (
     MetricType,
     PerformanceAnalyticsOrchestrator,
     get_performance_orchestrator,

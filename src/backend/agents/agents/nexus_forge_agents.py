@@ -11,9 +11,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-import google.generativeai as genai
 from google.cloud import aiplatform
-from vertexai.preview.generative_models import GenerativeModel, Tool
+from vertexai.preview.generative_models import GenerativeModel
 
 # Import Jules client for autonomous coding
 from ...integrations.google.jules_client import JulesClient, JulesTaskType

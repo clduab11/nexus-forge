@@ -4,8 +4,6 @@ Multi-level caching with intelligent eviction and predictive pre-loading
 """
 
 import asyncio
-import hashlib
-import json
 import logging
 import pickle
 import statistics
@@ -14,7 +12,7 @@ import zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 

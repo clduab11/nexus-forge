@@ -1,8 +1,7 @@
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
-import aiofiles
 import jinja2
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
 from pydantic import BaseModel, EmailStr

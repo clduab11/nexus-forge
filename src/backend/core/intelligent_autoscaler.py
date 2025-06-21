@@ -4,23 +4,21 @@ Advanced auto-scaling with predictive capabilities and multi-dimensional optimiz
 """
 
 import asyncio
-import json
 import logging
 import math
 import time
 from collections import defaultdict, deque
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional
 import numpy as np
-from scipy import signal
-from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 
 from .scalability.enterprise_scalability import AutoScaler, ScalingPolicy, ScalingEvent
-from .resource_optimizer import ResourceOptimizer, ResourceType, ResourceMetrics
-from .intelligent_load_manager import IntelligentLoadManager, LoadSnapshot
+from .resource_optimizer import ResourceOptimizer
+from .intelligent_load_manager import IntelligentLoadManager
+import statistics
 
 logger = logging.getLogger(__name__)
 
@@ -413,7 +411,7 @@ class IntelligentAutoScaler:
                 if current_day in pattern["high_load_days"]:
                     if current_instances < pattern["recommended_instances"]:
                         decision = ScalingDecision.SCALE_OUT
-                        reason = f"High load day pattern detected"
+                        reason = "High load day pattern detected"
                         confidence = pattern["confidence"]
                         required_instances = pattern["recommended_instances"]
                         break

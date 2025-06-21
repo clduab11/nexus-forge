@@ -3,8 +3,6 @@ Agent Registry Service
 Handles agent package registration, versioning, and management
 """
 
-import asyncio
-import json
 import os
 import shutil
 import tempfile
@@ -19,8 +17,6 @@ from .models import (
     AgentManifest,
     AgentPackage,
     AgentStatus,
-    PerformanceMetrics,
-    SecurityReport,
 )
 from .performance_benchmarker import PerformanceBenchmarker
 from .security_scanner import SecurityScanner

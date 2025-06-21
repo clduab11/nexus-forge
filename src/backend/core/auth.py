@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from typing import Optional, Union
+from typing import Optional
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -9,10 +9,21 @@ from jwt.exceptions import PyJWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from . import models
-from .config import get_security_settings, settings
-from .database import get_db
-from .monitoring import structured_logger
+from .. import models
+from ..config import get_security_settings
+from ..database import get_db
+# Temporarily disabled for testing - monitoring import causes hang
+# from .monitoring import structured_logger
+
+# Fallback logger for testing
+import logging
+class FallbackLogger:
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+    def log(self, level, message, **kwargs):
+        getattr(self.logger, level)(f"{message} - {kwargs}")
+
+structured_logger = FallbackLogger()
 
 # Security context for password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

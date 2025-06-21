@@ -21,8 +21,7 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 
-from ...agents.starri.orchestrator import AgentCapability, StarriOrchestrator
-from ...config import settings
+from ...agents.starri.orchestrator import StarriOrchestrator
 from ...core.auth import get_current_user
 from ...core.monitoring import StructuredLogger
 from ...database import get_db

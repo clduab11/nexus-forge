@@ -4,18 +4,16 @@ Handles cross-region data replication and synchronization
 """
 
 import asyncio
-import hashlib
-import json
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 
 from ..core.cache import RedisCache
-from ..core.exceptions import NotFoundError, ResourceError, ValidationError
+from ..core.exceptions import NotFoundError, ValidationError
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
-from .models import DataSyncConfig, HealthStatus, Region, RegionStatus, ReplicationMode
+from .models import DataSyncConfig
 from .region_manager import RegionManager
 
 logger = logging.getLogger(__name__)

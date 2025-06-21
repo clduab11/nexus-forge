@@ -3,9 +3,7 @@ Enterprise Security Manager for Nexus Forge
 Comprehensive security, compliance, and access control system
 """
 
-import asyncio
 import base64
-import hashlib
 import re
 import secrets
 from dataclasses import asdict, dataclass
@@ -16,8 +14,6 @@ from typing import Any, Dict, List, Optional, Set
 import bcrypt
 import jwt
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from nexus_forge.core.exceptions import (
     AuthenticationError,

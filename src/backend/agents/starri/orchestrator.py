@@ -7,11 +7,10 @@ reflection, and complex task coordination across multiple AI agents.
 
 import asyncio
 import json
-import logging
 import time
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from nexus_forge.core.cache import CacheStrategy, RedisCache

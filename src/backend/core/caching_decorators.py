@@ -8,9 +8,8 @@ import hashlib
 import json
 import logging
 import time
-from datetime import datetime, timedelta
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional
 
 from .cache import CacheStrategy, RedisCache
 

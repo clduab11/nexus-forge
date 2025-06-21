@@ -4,23 +4,19 @@ Handles region lifecycle, monitoring, and coordination
 """
 
 import asyncio
-import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from ..core.cache import RedisCache
 from ..core.exceptions import NotFoundError, ResourceError, ValidationError
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
 from .models import (
     EdgeLocation,
-    GeographicLocation,
     GlobalMetrics,
     HealthStatus,
-    LoadBalancingStrategy,
     Region,
-    RegionConfig,
     RegionMetrics,
     RegionStatus,
     ResourceMetrics,

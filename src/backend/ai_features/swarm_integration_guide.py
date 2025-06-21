@@ -415,7 +415,7 @@ async def main():
     print("1. Research Swarm Example")
     try:
         research_result = await SwarmIntegrationExamples.example_research_swarm()
-        print(f"   Research completed successfully\n")
+        print("   Research completed successfully\n")
     except Exception as e:
         print(f"   Error: {e}\n")
     
@@ -423,7 +423,7 @@ async def main():
     print("2. Optimization Swarm Example")
     try:
         optimization_result = await SwarmIntegrationExamples.example_optimization_swarm()
-        print(f"   Optimization completed successfully\n")
+        print("   Optimization completed successfully\n")
     except Exception as e:
         print(f"   Error: {e}\n")
     
