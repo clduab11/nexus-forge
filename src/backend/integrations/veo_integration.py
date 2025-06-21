@@ -6,7 +6,6 @@ user flow animations, and interactive prototypes.
 """
 
 import asyncio
-import json
 import logging
 import os
 from dataclasses import dataclass
@@ -21,7 +20,6 @@ from google.oauth2 import service_account
 from nexus_forge.core.caching_decorators import (
     CacheStrategy,
     cache_ai_response,
-    conditional_cache,
 )
 from nexus_forge.core.exceptions import ModelTimeoutError, ServiceUnavailableError
 
@@ -240,7 +238,7 @@ class VeoIntegration:
                 "outputConfig": {
                     "predictionsFormat": "jsonl",
                     "gcsDestination": {
-                        "outputUriPrefix": f"gs://nexus-forge-veo-outputs/"
+                        "outputUriPrefix": "gs://nexus-forge-veo-outputs/"
                     },
                 },
             }
@@ -276,7 +274,7 @@ class VeoIntegration:
             raise ServiceUnavailableError(
                 f"Network error calling Veo API: {str(e)}", service="veo"
             ) from e
-        except Exception as e:
+        except Exception:
             # Let the calling method handle exception conversion
             raise
 

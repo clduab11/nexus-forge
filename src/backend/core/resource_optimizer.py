@@ -5,26 +5,20 @@ for ADK Hackathon optimization
 """
 
 import asyncio
-import hashlib
-import json
 import logging
-import math
-import os
 import psutil
 import statistics
 import time
 from collections import defaultdict, deque
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional
 import numpy as np
-from scipy.stats import norm
-from scipy.optimize import minimize, linear_sum_assignment
-import concurrent.futures
+from scipy.optimize import linear_sum_assignment
 
-from .advanced_load_balancer import EnhancedLoadBalancer, ServerNode, ServerProfile
-from .scalability.enterprise_scalability import AutoScaler, ScalingPolicy
+from .advanced_load_balancer import EnhancedLoadBalancer
+from .scalability.enterprise_scalability import AutoScaler
 
 logger = logging.getLogger(__name__)
 

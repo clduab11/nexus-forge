@@ -3,13 +3,10 @@ Integrated Cache Optimization Module
 Combines Redis cache with intelligent multi-level caching for maximum performance
 """
 
-import asyncio
 import hashlib
-import json
 import logging
 import time
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Union, Callable
+from typing import Any, Dict, List, Optional, Callable
 from functools import wraps
 
 from .cache import RedisCache, CacheStrategy

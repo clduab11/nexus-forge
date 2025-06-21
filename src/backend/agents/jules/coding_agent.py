@@ -10,12 +10,10 @@ import json
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
-from ...core.google_cloud_auth import AIServiceError, GoogleCloudConfig
 from ...integrations.google.jules_client import (
     JulesClient,
-    JulesPlan,
     JulesTask,
     JulesTaskStatus,
     JulesTaskType,

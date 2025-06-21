@@ -4,37 +4,26 @@ Core engine for executing swarm tasks with dynamic load balancing and fault tole
 """
 
 import asyncio
-import json
-import logging
 import time
 from collections import defaultdict, deque
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional
 from uuid import uuid4
 
 import numpy as np
 import networkx as nx
-from scipy.stats import expon
 
 from nexus_forge.core.cache import CacheStrategy, RedisCache
-from nexus_forge.core.exceptions import (
-    AgentError,
-    CoordinationError,
-    ExecutionError,
-    ResourceError,
-)
 from nexus_forge.core.monitoring import get_logger
-from nexus_forge.integrations.supabase.coordination_client import SupabaseCoordinationClient
 
 from .swarm_intelligence import (
+import random
     SwarmAgent,
-    SwarmMessage,
     SwarmObjective,
     SwarmTask,
     SwarmResult,
-    CommunicationType,
 )
 
 logger = get_logger(__name__)

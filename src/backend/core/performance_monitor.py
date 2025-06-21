@@ -4,8 +4,6 @@ Real-time metrics, observability, and performance optimization
 """
 
 import asyncio
-import statistics
-import time
 from collections import defaultdict, deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone

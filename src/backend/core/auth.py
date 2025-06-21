@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from typing import Optional, Union
+from typing import Optional
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from .. import models
-from ..config import get_security_settings, settings
+from ..config import get_security_settings
 from ..database import get_db
 # Temporarily disabled for testing - monitoring import causes hang
 # from .monitoring import structured_logger

@@ -10,7 +10,6 @@ This script:
 """
 
 import argparse
-import json
 import os
 
 import yaml
@@ -19,7 +18,7 @@ from google.cloud.monitoring_dashboard import v1 as dashboard_v1
 
 from .alert_policies import AlertPolicyManager
 from .cloud_monitoring import CloudMonitoringService
-from .metrics_config import ALERT_THRESHOLDS, get_all_metrics
+from .metrics_config import get_all_metrics
 
 
 def create_custom_metrics(project_id: str):

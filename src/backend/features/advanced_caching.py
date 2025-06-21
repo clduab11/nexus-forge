@@ -20,19 +20,16 @@ import asyncio
 import hashlib
 import json
 import logging
-import math
-import pickle
 import time
 from collections import defaultdict, deque
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
-from ..core.cache import CacheMetrics, CacheStrategy, RedisCache
-from ..core.monitoring import PerformanceMonitor
+from ..core.cache import CacheStrategy, RedisCache
 
 logger = logging.getLogger(__name__)
 

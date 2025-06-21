@@ -4,25 +4,17 @@ Optimizes edge locations and content delivery
 """
 
 import asyncio
-import hashlib
-import json
 import logging
-import statistics
-from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 
 from ..core.cache import RedisCache
-from ..core.exceptions import NotFoundError, ResourceError, ValidationError
+from ..core.exceptions import NotFoundError, ValidationError
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
 from .load_balancer import GlobalLoadBalancer
 from .models import (
     EdgeLocation,
-    EdgeTier,
-    GeographicLocation,
     HealthStatus,
-    Region,
-    ResourceMetrics,
 )
 from .region_manager import RegionManager
 

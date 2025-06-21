@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
 
 import jwt
-from fastapi import HTTPException, status
 from jwt.exceptions import PyJWTError
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -20,7 +18,7 @@ from ..api.dependencies.oauth import (
     instagram_oauth,
 )
 from ..api.schemas.auth import Token, UserCreate
-from ..api.schemas.oauth import OAuthProvider, OAuthUserData
+from ..api.schemas.oauth import OAuthProvider
 from ..config import settings
 from ..models import RefreshToken, User
 

@@ -5,14 +5,13 @@ Advanced multi-agent orchestration with emergent behaviors and collective intell
 
 import asyncio
 import json
-import logging
 import time
 from abc import ABC, abstractmethod
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 from uuid import uuid4
 
 import numpy as np
@@ -21,15 +20,8 @@ from scipy.spatial.distance import euclidean
 from sklearn.metrics.pairwise import cosine_similarity
 
 from nexus_forge.core.cache import CacheStrategy, RedisCache
-from nexus_forge.core.exceptions import (
-    AgentError,
-    CoordinationError,
-    ResourceError,
-    ValidationError,
-)
 from nexus_forge.core.monitoring import get_logger
 from nexus_forge.integrations.google.gemini_client import GeminiClient
-from nexus_forge.integrations.supabase.coordination_client import SupabaseCoordinationClient
 
 logger = get_logger(__name__)
 

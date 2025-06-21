@@ -5,35 +5,26 @@ Provides multiple export formats for research results including
 PDF, DOCX, Notion, and custom integrations.
 """
 
-import asyncio
 import base64
 import csv
 import io
 import json
 import logging
 from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-import pandas as pd
 import xlsxwriter
 
 # Additional export libraries
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Inches, Pt, RGBColor
 from notion_client import AsyncClient as NotionClient
-from reportlab.graphics.charts.barcharts import VerticalBarChart
-from reportlab.graphics.charts.piecharts import Pie
-from reportlab.graphics.shapes import Drawing
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.pagesizes import A4, letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (
-    Image,
-    KeepTogether,
     PageBreak,
     Paragraph,
     SimpleDocTemplate,

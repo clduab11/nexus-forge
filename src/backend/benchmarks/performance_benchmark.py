@@ -8,7 +8,7 @@ import json
 import time
 import statistics
 from datetime import datetime, timezone
-from typing import Dict, List, Any
+from typing import Dict, Any
 import numpy as np
 import psutil
 
@@ -107,7 +107,7 @@ class PerformanceBenchmark:
                 
                 print(f"  Original: {original_throughput:.2f} tasks/sec")
             except asyncio.TimeoutError:
-                print(f"  Original: TIMEOUT")
+                print("  Original: TIMEOUT")
                 results["original"][count] = {"error": "timeout"}
             finally:
                 await original_engine.shutdown()
@@ -139,7 +139,7 @@ class PerformanceBenchmark:
                     print(f"  Improvement: {improvement:.1f}%")
                     
             except asyncio.TimeoutError:
-                print(f"  Optimized: TIMEOUT")
+                print("  Optimized: TIMEOUT")
                 results["optimized"][count] = {"error": "timeout"}
             finally:
                 await optimized_engine.shutdown()
@@ -208,7 +208,7 @@ class PerformanceBenchmark:
             }
         }
         
-        print(f"\nLatency Results:")
+        print("\nLatency Results:")
         print(f"  Original - Mean: {self.results['benchmarks']['latency']['original']['mean']:.2f}ms, "
               f"P95: {self.results['benchmarks']['latency']['original']['p95']:.2f}ms")
         print(f"  Optimized - Mean: {self.results['benchmarks']['latency']['optimized']['mean']:.2f}ms, "

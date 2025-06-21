@@ -6,7 +6,6 @@ ADK services, and monitoring systems.
 """
 
 import asyncio
-import json
 import time
 import uuid
 from typing import Dict, List, Optional, Any, Set
@@ -32,8 +31,7 @@ from .discovery import (
 from .security import (
     SecureChannelManager,
     AgentCertificateManager,
-    MessageEncryption,
-    SecureChannelConfig
+    MessageEncryption
 )
 from .negotiation import (
     CapabilityNegotiationEngine,

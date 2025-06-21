@@ -4,18 +4,14 @@ Handles database operations, real-time subscriptions, and agent coordination
 """
 
 import asyncio
-import json
-import logging
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
-from uuid import UUID, uuid4
 
-import httpx
 from postgrest import APIError
 from supabase import Client, create_client
 from supabase.lib.client_options import ClientOptions
 
-from nexus_forge.core.exceptions import AgentError, CoordinationError
+from nexus_forge.core.exceptions import CoordinationError
 from nexus_forge.core.monitoring import get_logger
 
 logger = get_logger(__name__)

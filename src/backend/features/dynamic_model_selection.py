@@ -27,14 +27,11 @@ import math
 import re
 import statistics
 import time
-import traceback
 import uuid
 from collections import defaultdict, deque
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict, dataclass, field
-from datetime import datetime, timedelta
+from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -49,8 +46,7 @@ except ImportError:
     # Fallback to basic text processing if nltk not available
     nltk = None
 
-from ..core.cache import CacheStrategy, RedisCache
-from ..core.monitoring import PerformanceMonitor
+from ..core.cache import RedisCache
 
 logger = logging.getLogger(__name__)
 

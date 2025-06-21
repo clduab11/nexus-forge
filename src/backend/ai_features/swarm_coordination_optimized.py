@@ -7,24 +7,20 @@ import asyncio
 import time
 import numpy as np
 from collections import defaultdict, deque
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from .swarm_intelligence import (
     SwarmAgent,
     SwarmCoordinator,
-    SwarmMessage,
     SwarmObjective,
     SwarmTask,
     CommunicationType,
 )
 from ..protocols.agent2agent.fast_coordination import (
     OptimizedSwarmCommunication,
-    FastHierarchicalCoordinator,
     ParallelCoordinator,
-    FastMessageRouter,
     ZeroCopyMessagePool,
 )
 from nexus_forge.core.monitoring import get_logger

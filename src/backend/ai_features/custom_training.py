@@ -7,9 +7,9 @@ import asyncio
 import json
 import logging
 import pickle
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -25,7 +25,6 @@ from ..core.cache import RedisCache
 from ..core.exceptions import NotFoundError, ResourceError, ValidationError
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
 from .models import (
-    HyperParameters,
     ModelArchitecture,
     ModelEvaluation,
     PredictionModel,
@@ -691,7 +690,7 @@ class CustomTrainingEngine:
         await self._update_training_job(job)
 
         # Start training in background
-        training_task = asyncio.create_task(self._execute_training_job(job))
+        _training_task = asyncio.create_task(self._execute_training_job(job))
 
         return True
 
@@ -834,7 +833,7 @@ class CustomTrainingEngine:
             evaluation = await pipeline.train(X, y)
 
             # Save model artifacts
-            model_path = await self._save_model_artifacts(job, pipeline)
+            _model_path = await self._save_model_artifacts(job, pipeline)
 
             # Update job with results
             job.status = TrainingJobStatus.COMPLETED

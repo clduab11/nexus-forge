@@ -4,16 +4,14 @@ import logging
 import os
 import time
 import traceback
-import uuid
 from collections import defaultdict, deque
 from contextvars import ContextVar
 from datetime import datetime, timedelta
 from functools import wraps
 from threading import Lock
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, Optional
 
 import psutil
-import redis
 from prometheus_client import Counter, Gauge, Histogram, Info, start_http_server
 
 # Optional OpenTelemetry imports with fallback
@@ -30,7 +28,6 @@ except ImportError:
     OPENTELEMETRY_AVAILABLE = False
     trace = None
 # Configure logging - ensure logs directory exists
-import os
 import threading
 from dataclasses import asdict, dataclass
 

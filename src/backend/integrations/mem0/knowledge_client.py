@@ -5,12 +5,10 @@ Provides intelligent knowledge management for agents, patterns, and relationship
 using Mem0's graph-based memory system.
 """
 
-import asyncio
 import hashlib
 import json
-import logging
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from nexus_forge.core.cache import CacheStrategy, RedisCache

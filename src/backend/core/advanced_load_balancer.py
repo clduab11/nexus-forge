@@ -3,24 +3,18 @@ Advanced Load Balancer Enhancement Module
 Implements sophisticated load balancing algorithms with dynamic scaling
 """
 
-import asyncio
-import json
 import logging
 import math
-import statistics
 import time
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, Callable
+from typing import Any, Dict, List, Optional, Set, Tuple
 import numpy as np
-from scipy.stats import norm, expon
-from scipy.optimize import minimize
 
 from .load_balancer import (
-    ServerNode, LoadBalancingStrategy, LoadBalancingMetrics,
-    AdvancedLoadBalancer as BaseLoadBalancer
+    ServerNode, LoadBalancingStrategy, AdvancedLoadBalancer as BaseLoadBalancer
 )
 
 logger = logging.getLogger(__name__)

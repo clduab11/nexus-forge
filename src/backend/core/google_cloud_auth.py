@@ -7,9 +7,8 @@ import json
 import logging
 import os
 import random
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-import google.auth.exceptions
 from google.auth import default
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account

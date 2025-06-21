@@ -17,7 +17,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import aiohttp
 
@@ -25,7 +25,6 @@ from ...core.google_cloud_auth import (
     AIServiceError,
     GoogleCloudAuth,
     GoogleCloudConfig,
-    retry_with_exponential_backoff,
 )
 
 logger = logging.getLogger(__name__)
@@ -790,29 +789,29 @@ httpx==0.25.2
             # React application files
             files[
                 "frontend/src/App.tsx"
-            ] = f"""import React from 'react';
-import {{ BrowserRouter as Router, Routes, Route }} from 'react-router-dom';
-import {{ ThemeProvider }} from '@mui/material/styles';
+            ] = """import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import theme from './theme';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 
-function App() {{
+function App() {
   return (
-    <ThemeProvider theme={{theme}}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
         <Layout>
           <Routes>
-            <Route path="/" element={{<Dashboard />}} />
+            <Route path="/" element={<Dashboard />} />
           </Routes>
         </Layout>
       </Router>
     </ThemeProvider>
   );
-}}
+}
 
 export default App;
 """

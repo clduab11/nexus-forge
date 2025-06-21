@@ -4,17 +4,15 @@ Converts visual workflow definitions into executable format
 """
 
 from collections import defaultdict, deque
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List
 
 import networkx as nx
 
 from ..core.exceptions import ValidationError
 from .models import (
     ConnectionType,
-    ExecutionStatus,
     NodeType,
     Workflow,
-    WorkflowConnection,
     WorkflowNode,
 )
 

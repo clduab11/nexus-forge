@@ -5,27 +5,22 @@ Self-correcting quality assessment and improvement system
 
 import asyncio
 import hashlib
-import json
 import logging
 import statistics
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-import pandas as pd
 
 from ..core.cache import RedisCache
-from ..core.exceptions import NotFoundError, ResourceError, ValidationError
+from ..core.exceptions import ValidationError
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
 from .models import (
-    PredictionModel,
     QualityDimension,
     QualityMetrics,
-    TrainingJob,
-    TrainingJobStatus,
 )
 
 logger = logging.getLogger(__name__)

@@ -5,15 +5,12 @@ High-performance execution engine with advanced parallelization and resource opt
 
 import asyncio
 import aiohttp
-import json
-import logging
 import time
 from collections import defaultdict, deque
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
-from functools import lru_cache, partial
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from datetime import datetime, timezone
+from functools import partial
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 from uuid import uuid4
 
 import numpy as np
@@ -22,20 +19,14 @@ from asyncio_throttle import Throttler
 
 from nexus_forge.core.cache import CacheStrategy, RedisCache
 from nexus_forge.core.exceptions import (
-    AgentError,
-    CoordinationError,
-    ExecutionError,
     ResourceError,
 )
 from nexus_forge.core.monitoring import get_logger
 
 from .swarm_intelligence import (
     SwarmAgent,
-    SwarmMessage,
-    SwarmObjective,
     SwarmTask,
     SwarmResult,
-    CommunicationType,
 )
 
 logger = get_logger(__name__)

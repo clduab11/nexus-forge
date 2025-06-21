@@ -6,18 +6,14 @@ from typing import AsyncGenerator, Generator
 from sqlalchemy import create_engine, event
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, selectinload, joinedload, subqueryload, Query
-from sqlalchemy.pool import QueuePool, NullPool, StaticPool
-from sqlalchemy.pool import Pool
-from sqlalchemy import event
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool, StaticPool
 import threading
 import time
 from collections import defaultdict
 
 from .config import get_db_url, settings
-from .core.cache import RedisCache, CacheStrategy
-from .core.caching_decorators import cache_with_ttl, cache_ai_response
-from .core.db_optimization import query_builder, connection_pool
+from .core.cache import RedisCache
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,7 @@
 import base64
-import json
 import secrets
-from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from datetime import datetime
+from typing import Any, Dict
 
 import httpx
 import jwt
@@ -15,7 +14,6 @@ from ..schemas.oauth import (
     GoogleOAuthConfig,
     InstagramOAuthConfig,
     OAuthConfig,
-    OAuthError,
     OAuthProvider,
     OAuthTokenResponse,
     OAuthUserData,

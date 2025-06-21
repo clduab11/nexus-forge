@@ -5,14 +5,13 @@ Tests latency, throughput, and resource usage
 
 import asyncio
 import importlib.util
-import json
 import statistics
 import sys
 import tempfile
 import time
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import psutil
 

@@ -4,29 +4,25 @@ Implementation of various swarm coordination patterns for different scenarios
 """
 
 import asyncio
-import json
-import logging
 import random
 import time
-from collections import defaultdict, deque
+from collections import defaultdict
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Set, Tuple
-from uuid import uuid4
+from typing import Any, Dict, List
 
 import numpy as np
-import networkx as nx
 
 from .swarm_intelligence import (
     SwarmAgent,
     SwarmCoordinator,
     SwarmMessage,
     SwarmObjective,
+    SwarmPattern,
     SwarmTask,
     CommunicationType,
     Pheromone,
 )
-from nexus_forge.core.exceptions import CoordinationError
-from nexus_forge.core.monitoring import get_logger
+from ...core.monitoring import get_logger
 
 logger = get_logger(__name__)
 

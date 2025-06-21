@@ -12,7 +12,6 @@ from datetime import datetime
 from typing import AsyncGenerator
 
 from fastapi import (
-    Depends,
     FastAPI,
     HTTPException,
     Request,
@@ -28,7 +27,6 @@ from prometheus_client import make_asgi_app
 
 # Starri orchestrator integration
 from .agents.starri.orchestrator import StarriOrchestrator
-from .api.dependencies.auth import get_current_user
 
 # Security and middleware
 from .api.middleware.rate_limiter import RateLimiter
@@ -38,15 +36,13 @@ from .api.routers import adk, auth, health, nexus_forge, subscription
 from .core.exceptions import NexusForgeError
 
 # Monitoring
-from .core.monitoring import setup_monitoring, structured_logger
+from .core.monitoring import setup_monitoring
 
 # State management
 from .core.state import StateManager
-from .integrations.google.monitoring import CloudMonitoringService
 
 # Supabase integration
 from .integrations.supabase.coordination_client import SupabaseCoordinationClient
-from .models import User
 
 # WebSocket manager for real-time updates
 from .websockets.manager import WebSocketManager

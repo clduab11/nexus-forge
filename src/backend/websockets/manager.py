@@ -6,25 +6,22 @@ enhanced security, rate limiting, and Starri orchestration integration.
 """
 
 import asyncio
-import json
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, Optional, Set
 
-from fastapi import Depends, WebSocket, WebSocketDisconnect, status
+from fastapi import WebSocket, status
 from starlette.websockets import WebSocketState
 
 # Security and validation
 from ..api.middleware.rate_limiter import WebSocketRateLimiter
 
 # Core imports
-from ..core.exceptions import NexusForgeError, ValidationError
 from ..core.monitoring import structured_logger
 
 # Supabase integration
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
-from ..models import User
 
 logger = logging.getLogger(__name__)
 

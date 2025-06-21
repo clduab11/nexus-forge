@@ -5,13 +5,10 @@ Enables voice-based research queries using Google Cloud Speech-to-Text
 and Text-to-Speech APIs with ADK integration.
 """
 
-import asyncio
 import base64
 import io
-import json
 import logging
 import wave
-from datetime import datetime
 from typing import Any, AsyncGenerator, Dict, Optional
 
 from google.adk.streaming import AudioStreamingSession

@@ -12,11 +12,10 @@ import re
 import subprocess
 import tempfile
 import zipfile
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from .models import AgentPackage, SecurityReport
+from .models import SecurityReport
 
 
 class SecurityScanner:

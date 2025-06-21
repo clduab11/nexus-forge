@@ -3,16 +3,13 @@ Tenant Manager
 Orchestrates tenant lifecycle operations and management
 """
 
-import asyncio
 import logging
 import secrets
 from datetime import datetime, timedelta
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..core.cache import RedisCache
-from ..core.exceptions import NotFoundError, PermissionError, ValidationError
+from ..core.exceptions import NotFoundError, ValidationError
 from ..integrations.supabase.coordination_client import SupabaseCoordinationClient
 from .isolation_manager import TenantIsolationManager
 from .models import (
@@ -426,7 +423,7 @@ class TenantManager:
             invitation.tenant_id,
             "invitation_accepted",
             "user",
-            f"User accepted invitation",
+            "User accepted invitation",
             user_id=user_id,
             metadata={"invitation_id": invitation.id},
         )
